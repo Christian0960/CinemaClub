@@ -168,8 +168,10 @@ body {
 .rows-container {
   position: absolute;
   bottom: 0;
-  left: 110px; /* leaves room for reactions menu */
-  right: 20px;
+
+  /* equal aisles */
+  left: 120px;
+  right: 120px;
 
   display: flex;
   flex-direction: column-reverse;
@@ -243,8 +245,9 @@ body {
   /* ───────────────── REACTIONS ───────────────── */
 .reactions-container {
   position: absolute;
-  bottom: 20px;
-  left: 20px;
+  bottom: 35px;
+  left: 35px;
+
   z-index: 20;
 }
 
@@ -384,7 +387,7 @@ body {
   </div>
 
   <button class="reaction-toggle" onclick="toggleReactions()">
-    
+    React
   </button>
 
 </div>
