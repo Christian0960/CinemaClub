@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>Virtual Cinema</title>
+  <title>CinemaClub</title>
   <style>
     body {
       margin: 0;
@@ -13,25 +13,34 @@
       flex-direction: column;
       align-items: center;
       height: 100vh;
+      overflow: hidden;
     }
+
     h1 {
-      margin-top: 20px;
+      margin: 16px 0 10px;
       font-weight: normal;
       letter-spacing: 2px;
       opacity: 0.8;
+      flex-shrink: 0;
     }
+
     .controls {
-      margin-top: 10px;
       display: flex;
       gap: 10px;
+      flex-shrink: 0;
+      margin-bottom: 12px;
     }
+
     input {
       width: 320px;
       padding: 10px;
       border: none;
       border-radius: 6px;
       outline: none;
+      background: #222;
+      color: white;
     }
+
     button {
       padding: 10px 15px;
       border: none;
@@ -41,54 +50,123 @@
       color: white;
       font-weight: bold;
     }
+
     button:hover {
       background: #ff5555;
     }
-    .screen-wrapper {
-      margin-top: 30px;
-      width: 900px;
-      max-width: 90vw;
-      aspect-ratio: 16 / 9;
-      background: #000;
+
+    /* OUTER THEATER FRAME */
+    .theater {
+      width: 90vw;
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      border: 2px solid rgba(255,255,255,0.2);
       border-radius: 12px;
+      overflow: hidden;
       box-shadow:
         0 0 40px rgba(255, 0, 0, 0.15),
         0 0 120px rgba(0, 0, 0, 0.8);
-      border: 2px solid rgba(255,255,255,0.08);
-      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    /* SCREEN AREA */
+    .screen {
+      flex: 3;
+      border-bottom: 2px solid rgba(255,255,255,0.2);
       position: relative;
+      background: #000;
     }
-    .screen-wrapper::after {
-      content: "";
-      position: absolute;
-      inset: -40px;
-      background: radial-gradient(circle, rgba(255,0,0,0.08), transparent 60%);
-      pointer-events: none;
-    }
+
+    /* YOUTUBE PLAYER FILLS SCREEN */
     #player {
       width: 100%;
       height: 100%;
     }
-    .floor {
+
+    /* SCREEN LABEL */
+    .screen-label {
       position: absolute;
-      bottom: 0;
-      width: 100%;
-      height: 120px;
-      background: linear-gradient(to top, #000, transparent);
+      top: 12px;
+      left: 16px;
+      color: white;
+      opacity: 0.4;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
       pointer-events: none;
+      z-index: 1;
+    }
+
+    /* SEATING AREA */
+    .seats {
+      flex: 1;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      background: #0a0a0a;
+      padding: 0 20px;
+    }
+
+    /* EACH SEAT */
+    .chair {
+      width: 70px;
+      height: 70px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 10px;
+      position: relative;
+      background: #111;
+    }
+
+    /* PERSON HEAD */
+    .person-head {
+      width: 26px;
+      height: 26px;
+      border: 2px solid rgba(255,255,255,0.5);
+      border-radius: 50%;
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a1a1a;
+    }
+
+    /* PERSON BODY */
+    .person-body {
+      width: 36px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 6px 6px 0 0;
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a1a1a;
     }
   </style>
 </head>
 <body>
-  <h1>Virtual Cinema</h1>
+  <h1>CinemaCLub</h1>
   <div class="controls">
     <input id="videoInput" placeholder="Paste YouTube link or video ID..." />
     <button onclick="loadVideo()">Load</button>
   </div>
-  <div class="screen-wrapper">
-    <div id="player"></div>
-    <div class="floor"></div>
+
+  <div class="theater">
+    <div class="screen">
+      <div id="player"></div>
+      <div class="screen-label">screen</div>
+    </div>
+    <div class="seats">
+      <div class="chair"><div class="person-head"></div><div class="person-body"></div></div>
+      <div class="chair"><div class="person-head"></div><div class="person-body"></div></div>
+      <div class="chair"><div class="person-head"></div><div class="person-body"></div></div>
+      <div class="chair"><div class="person-head"></div><div class="person-body"></div></div>
+      <div class="chair"><div class="person-head"></div><div class="person-body"></div></div>
+    </div>
   </div>
+
   <script>
     let player;
     let tag = document.createElement('script');
@@ -97,12 +175,12 @@
 
     function onYouTubeIframeAPIReady() {
       player = new YT.Player('player', {
-        width: '100%',   // fix: explicitly set so iframe fills the wrapper
+        width: '100%',
         height: '100%',
         videoId: 'M7lc1UVf-VE',
         playerVars: {
-          rel: 0
-          // removed deprecated modestbranding
+          rel: 0,
+          controls: 1
         },
         events: {
           onReady: () => console.log('Player ready')
@@ -115,7 +193,6 @@
       if (match) return match[1];
       match = url.match(/youtu\.be\/([^?&]+)/);
       if (match) return match[1];
-      // fix: only accept valid bare IDs, don't pass garbage to the player
       if (/^[a-zA-Z0-9_-]{11}$/.test(url)) return url;
       return null;
     }
@@ -130,7 +207,6 @@
       if (id) {
         player.loadVideoById(id);
       } else {
-        // fix: user now gets feedback on bad input instead of silent failure
         alert("Couldn't find a valid YouTube video ID. Paste a full YouTube link or an 11-character video ID.");
       }
     }
