@@ -22,62 +22,39 @@ body {
 .screen-section {
   position: relative;
   height: 58%;
-  margin: 12px 12px 0 12px;
+  margin: 12px;
   border-radius: 14px;
   overflow: hidden;
 
   background: #000;
   border: 1px solid rgba(255,255,255,0.08);
 
-  transform: perspective(1200px) rotateX(-6deg);
+  transform: perspective(1200px) rotateX(-5deg);
   transform-origin: top center;
 
   box-shadow:
     0 80px 180px rgba(0,0,0,0.95),
-    0 0 140px rgba(255,40,40,0.18),
-    inset 0 0 80px rgba(255,255,255,0.05);
+    inset 0 0 60px rgba(255,255,255,0.04);
 }
 
 #player {
   width: 100%;
   height: 100%;
-  position: relative;
-  z-index: 1;
 }
 
-/* SCREEN LIGHT PROJECTING DOWN INTO THE ROOM */
+/* subtle neutral lighting only */
 .screen-section::before {
   content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 2;
 
-  background:
-    radial-gradient(circle at 50% 100%,
-      rgba(255,80,80,0.35),
-      transparent 60%),
-    linear-gradient(to bottom,
-      rgba(255,255,255,0.06),
-      transparent 40%,
-      rgba(0,0,0,0.5));
-}
-
-/* LIGHT BEAM SPILL INTO AUDIENCE */
-.screen-section::after {
-  content: '';
-  position: absolute;
-  bottom: -120px;
-  left: -20%;
-  width: 140%;
-  height: 160px;
-
-  background: radial-gradient(circle,
-    rgba(255,60,60,0.18),
-    transparent 70%);
-
-  filter: blur(20px);
-  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.06),
+    transparent 50%,
+    rgba(0,0,0,0.6)
+  );
 }
 
 /* ───────────────── OVERLAY ───────────────── */
@@ -90,21 +67,20 @@ body {
   align-items: center;
   gap: 14px;
 
-  background: rgba(0,0,0,0.9);
+  background: rgba(0,0,0,0.92);
   z-index: 5;
 
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  transition: opacity 0.35s ease;
 }
 
 .screen-overlay.hidden {
   opacity: 0;
   pointer-events: none;
-  transform: scale(1.05);
 }
 
 .screen-overlay h2 {
   letter-spacing: 10px;
-  color: rgba(255,255,255,0.55);
+  color: rgba(255,255,255,0.6);
   font-weight: 300;
 }
 
@@ -121,6 +97,7 @@ body {
   color: white;
 }
 
+/* RED PLAY BUTTON BACK */
 .overlay-controls button {
   background: #ff3b3b;
   border: none;
@@ -149,104 +126,81 @@ body {
   pointer-events: all;
 }
 
-/* ───────────────── AUDIENCE ───────────────── */
+/* ───────────────── AUDIENCE (FIXED GRID LOGIC) ───────────────── */
 .audience-section {
   height: 42%;
   margin: 0 12px 12px;
   position: relative;
   overflow: hidden;
 
-  background:
-    radial-gradient(circle at 50% 0%,
-      rgba(255,60,60,0.14),
-      transparent 55%),
-    linear-gradient(to bottom, #0a0a0a, #000);
-
+  background: linear-gradient(to bottom, #0a0a0a, #000);
   border-radius: 0 0 12px 12px;
 
-  /* subtle room tilt */
-  transform: perspective(1200px) rotateX(8deg);
+  transform: perspective(1200px) rotateX(7deg);
   transform-origin: top center;
 }
 
-/* rows fill full width evenly */
 .rows-container {
   position: absolute;
   bottom: 0;
   width: 100%;
   display: flex;
   flex-direction: column-reverse;
-  align-items: stretch;
 
-  perspective: 900px;
-  padding: 10px 20px;
+  gap: 8px;
+  padding: 10px 10px;
 }
 
-/* each row spans full width like real theater */
+/* each row is a tight seating line */
 .row {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-
-  width: 100%;
-  margin-bottom: 6px;
+  justify-content: center;
+  gap: 6px; /* THIS is the key fix */
 }
 
-/* depth layers */
-.row-0 { transform: translateZ(0px) scale(1); opacity: 1; }
-.row-1 { transform: translateZ(-40px) scale(0.92); opacity: 0.9; }
-.row-2 { transform: translateZ(-90px) scale(0.82); opacity: 0.72; }
-.row-3 { transform: translateZ(-150px) scale(0.70); opacity: 0.52; }
-.row-4 { transform: translateZ(-220px) scale(0.60); opacity: 0.38; }
+/* 4 rows only */
+.row-0 { opacity: 1; }
+.row-1 { opacity: 0.85; transform: scale(0.95); }
+.row-2 { opacity: 0.7; transform: scale(0.9); }
+.row-3 { opacity: 0.55; transform: scale(0.85); }
 
-/* no aisles anymore — real theater density */
+/* seat unit */
 .person {
   display: flex;
   flex-direction: column;
   align-items: center;
-  filter: drop-shadow(0 6px 6px rgba(0,0,0,0.7));
+
+  width: 44px;   /* FIXED WIDTH prevents zoom gaps */
 }
 
-/* head */
+/* head/body/seat */
 .head {
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.9);
   background: radial-gradient(circle at 30% 30%, #222, #000);
-}
-
-/* body */
-.body {
   border: 2px solid rgba(255,255,255,0.85);
-  border-radius: 6px;
+}
+
+.body {
+  width: 34px;
+  height: 30px;
   background: linear-gradient(to bottom, #111, #000);
+  border: 2px solid rgba(255,255,255,0.8);
+  border-radius: 6px;
 }
 
-/* seat */
 .chair-seat {
+  width: 40px;
+  height: 7px;
   background: linear-gradient(to bottom, #222, #111);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
 }
 
-/* consistent scaling per row */
-.row-0 .head { width: 44px; height: 44px; }
-.row-0 .body { width: 72px; height: 62px; }
-.row-0 .chair-seat { width: 88px; height: 10px; }
-
-.row-1 .head { width: 38px; height: 38px; }
-.row-1 .body { width: 62px; height: 54px; }
-.row-1 .chair-seat { width: 76px; height: 9px; }
-
-.row-2 .head { width: 32px; height: 32px; }
-.row-2 .body { width: 52px; height: 46px; }
-.row-2 .chair-seat { width: 64px; height: 8px; }
-
-.row-3 .head { width: 26px; height: 26px; }
-.row-3 .body { width: 42px; height: 38px; }
-.row-3 .chair-seat { width: 52px; height: 7px; }
-
-.row-4 .head { width: 20px; height: 20px; }
-.row-4 .body { width: 34px; height: 30px; }
-.row-4 .chair-seat { width: 42px; height: 6px; }
+/* row scaling differences (depth illusion only) */
+.row-0 .person { transform: scale(1); }
+.row-1 .person { transform: scale(0.95); }
+.row-2 .person { transform: scale(0.9); }
+.row-3 .person { transform: scale(0.85); }
 
 </style>
 </head>
@@ -270,9 +224,12 @@ body {
 <div class="audience-section">
   <div class="rows-container">
 
-    <!-- FULL WIDTH DENSITY ROWS (NO SHRINKING) -->
-
+    <!-- ROW 0 -->
     <div class="row row-0">
+      <!-- dense seating -->
+      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
       <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
       <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
       <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
@@ -282,44 +239,25 @@ body {
       <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
     </div>
 
+    <!-- ROW 1 -->
     <div class="row row-1">
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+      <div class="person"></div><div class="person"></div><div class="person"></div><div class="person"></div>
+      <div class="person"></div><div class="person"></div><div class="person"></div><div class="person"></div>
+      <div class="person"></div><div class="person"></div>
     </div>
 
+    <!-- ROW 2 -->
     <div class="row row-2">
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+      <div class="person"></div><div class="person"></div><div class="person"></div><div class="person"></div>
+      <div class="person"></div><div class="person"></div><div class="person"></div><div class="person"></div>
+      <div class="person"></div><div class="person"></div>
     </div>
 
+    <!-- ROW 3 -->
     <div class="row row-3">
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
-    </div>
-
-    <div class="row row-4">
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+      <div class="person"></div><div class="person"></div><div class="person"></div><div class="person"></div>
+      <div class="person"></div><div class="person"></div><div class="person"></div><div class="person"></div>
+      <div class="person"></div><div class="person"></div>
     </div>
 
   </div>
