@@ -34,7 +34,6 @@ body {
 
   box-shadow:
     0 80px 180px rgba(0,0,0,0.95),
-    0 0 140px rgba(255,40,40,0.18),
     inset 0 0 80px rgba(255,255,255,0.05);
 }
 
@@ -54,9 +53,6 @@ body {
   z-index: 2;
 
   background:
-    radial-gradient(circle at 50% 100%,
-      rgba(255,80,80,0.35),
-      transparent 60%),
     linear-gradient(to bottom,
       rgba(255,255,255,0.06),
       transparent 40%,
@@ -72,11 +68,8 @@ body {
   width: 140%;
   height: 160px;
 
-  background: radial-gradient(circle,
-    rgba(255,60,60,0.18),
-    transparent 70%);
+  background: transparent;
 
-  filter: blur(20px);
   pointer-events: none;
 }
 
@@ -157,14 +150,10 @@ body {
   overflow: hidden;
 
   background:
-    radial-gradient(circle at 50% 0%,
-      rgba(255,60,60,0.14),
-      transparent 55%),
     linear-gradient(to bottom, #0a0a0a, #000);
 
   border-radius: 0 0 12px 12px;
 
-  /* subtle room tilt */
   transform: perspective(1200px) rotateX(8deg);
   transform-origin: top center;
 }
@@ -199,7 +188,6 @@ body {
 .row-3 { transform: translateZ(-150px) scale(0.70); opacity: 0.52; }
 .row-4 { transform: translateZ(-220px) scale(0.60); opacity: 0.38; }
 
-/* no aisles anymore — real theater density */
 .person {
   display: flex;
   flex-direction: column;
@@ -207,27 +195,23 @@ body {
   filter: drop-shadow(0 6px 6px rgba(0,0,0,0.7));
 }
 
-/* head */
 .head {
   border-radius: 50%;
   border: 2px solid rgba(255,255,255,0.9);
   background: radial-gradient(circle at 30% 30%, #222, #000);
 }
 
-/* body */
 .body {
   border: 2px solid rgba(255,255,255,0.85);
   border-radius: 6px;
   background: linear-gradient(to bottom, #111, #000);
 }
 
-/* seat */
 .chair-seat {
   background: linear-gradient(to bottom, #222, #111);
   box-shadow: 0 4px 10px rgba(0,0,0,0.5);
 }
 
-/* consistent scaling per row */
 .row-0 .head { width: 44px; height: 44px; }
 .row-0 .body { width: 72px; height: 62px; }
 .row-0 .chair-seat { width: 88px; height: 10px; }
@@ -270,10 +254,7 @@ body {
 <div class="audience-section">
   <div class="rows-container">
 
-    <!-- FULL WIDTH DENSITY ROWS (NO SHRINKING) -->
-
     <div class="row row-0">
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
       <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
       <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
       <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
@@ -330,11 +311,6 @@ body {
     </div>
 
     <div class="row row-2">
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
-      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
       <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
       <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
       <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
