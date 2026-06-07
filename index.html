@@ -17,23 +17,23 @@
 
     /* ── SCREEN SECTION ── */
     .screen-section {
-      flex: 0 0 62%;
+      flex: 0 0 60%;
       position: relative;
       background: #000;
-      border: 2px solid #fff;
-      margin: 18px 18px 0 18px;
-      border-radius: 4px;
+      border: 2px solid #333;
+      margin: 12px 12px 0 12px;
+      border-radius: 6px;
       overflow: hidden;
+      box-shadow: 0 0 60px rgba(255,60,60,0.12), 0 0 120px rgba(255,60,60,0.05);
     }
 
-    /* YouTube fills the whole screen */
     #player {
       width: 100%;
       height: 100%;
       display: block;
     }
 
-    /* Load UI overlaid on the screen — hidden once video loads */
+    /* Load overlay */
     .screen-overlay {
       position: absolute;
       inset: 0;
@@ -41,8 +41,8 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      gap: 14px;
-      background: rgba(0,0,0,0.82);
+      gap: 16px;
+      background: rgba(0,0,0,0.88);
       z-index: 5;
       transition: opacity 0.4s;
     }
@@ -53,10 +53,10 @@
     }
 
     .screen-overlay h2 {
-      font-size: 1rem;
-      letter-spacing: 4px;
+      font-size: 1.3rem;
+      letter-spacing: 6px;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.5);
+      color: rgba(255,255,255,0.6);
       font-weight: normal;
     }
 
@@ -66,23 +66,21 @@
     }
 
     .overlay-controls input {
-      width: 260px;
-      padding: 9px 12px;
+      width: 300px;
+      padding: 10px 14px;
       background: #111;
       border: 1px solid #444;
       border-radius: 5px;
       color: white;
       font-family: 'Courier New', monospace;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       outline: none;
     }
 
-    .overlay-controls input:focus {
-      border-color: #ff3b3b;
-    }
+    .overlay-controls input:focus { border-color: #ff3b3b; }
 
     .overlay-controls button {
-      padding: 9px 18px;
+      padding: 10px 20px;
       background: #ff3b3b;
       border: none;
       border-radius: 5px;
@@ -93,30 +91,45 @@
       letter-spacing: 1px;
     }
 
-    .overlay-controls button:hover {
-      background: #ff5555;
-    }
+    .overlay-controls button:hover { background: #ff5555; }
 
-    /* Screen label top-left, fades out when playing */
-    .screen-label {
+    /* Exit button — shown when video is playing */
+    .exit-btn {
       position: absolute;
       top: 12px;
-      left: 16px;
-      font-size: 11px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.25);
-      z-index: 4;
+      right: 14px;
+      z-index: 10;
+      background: rgba(0,0,0,0.7);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.7);
+      font-family: 'Courier New', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      opacity: 0;
       pointer-events: none;
+      transition: opacity 0.3s, background 0.2s;
     }
 
-    /* Subtle red glow along bottom of screen */
+    .exit-btn.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .exit-btn:hover {
+      background: rgba(255,40,40,0.5);
+      border-color: #ff3b3b;
+      color: white;
+    }
+
     .screen-section::after {
       content: '';
       position: absolute;
       bottom: 0; left: 0; right: 0;
-      height: 40px;
-      background: linear-gradient(to top, rgba(255,40,40,0.08), transparent);
+      height: 50px;
+      background: linear-gradient(to top, rgba(255,40,40,0.07), transparent);
       pointer-events: none;
       z-index: 3;
     }
@@ -124,86 +137,132 @@
     /* ── AUDIENCE SECTION ── */
     .audience-section {
       flex: 1;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      gap: 32px;
-      padding: 0 40px 0 40px;
-      background: #0a0a0a;
       position: relative;
-      margin: 0 18px;
+      overflow: hidden;
+      margin: 0 12px;
+      background: #080808;
+      border-left: 2px solid #222;
+      border-right: 2px solid #222;
     }
 
-    /* Floor line separating screen from audience */
+    /* Ambient screen glow washing down */
     .audience-section::before {
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0;
-      height: 2px;
-      background: rgba(255,255,255,0.12);
-    }
-
-    /* Subtle ambient light from screen hitting audience */
-    .audience-section::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 10%; right: 10%;
-      height: 60%;
-      background: radial-gradient(ellipse at top, rgba(255,60,60,0.04), transparent 70%);
+      height: 50%;
+      background: radial-gradient(ellipse at top, rgba(255,60,60,0.07) 0%, transparent 70%);
       pointer-events: none;
+      z-index: 0;
     }
 
-    /* ── STICK FIGURE ── */
+    /* Floor perspective lines */
+    .floor-lines {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ROWS CONTAINER — perspective look with rows receding */
+    .rows-container {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: center;
+      gap: 0;
+      padding-bottom: 4px;
+    }
+
+    /* Each row gets smaller + lighter as it recedes */
+    .row {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      width: 100%;
+      position: relative;
+    }
+
+    .row-0 { transform: scaleX(1);    opacity: 1;    gap: 28px; }
+    .row-1 { transform: scaleX(0.82); opacity: 0.82; gap: 24px; margin-bottom: -6px; }
+    .row-2 { transform: scaleX(0.66); opacity: 0.65; gap: 20px; margin-bottom: -8px; }
+    .row-3 { transform: scaleX(0.52); opacity: 0.48; gap: 16px; margin-bottom: -10px; }
+    .row-4 { transform: scaleX(0.40); opacity: 0.32; gap: 12px; margin-bottom: -10px; }
+
+    /* ── PERSON ── */
     .person {
       display: flex;
       flex-direction: column;
       align-items: center;
-      flex: 1;
-      max-width: 120px;
+      position: relative;
     }
 
     /* HEAD */
     .head {
-      width: 44px;
-      height: 44px;
       border-radius: 50%;
-      border: 2.5px solid rgba(255,255,255,0.75);
+      border: 2.5px solid rgba(255,255,255,0.85);
       background: transparent;
       flex-shrink: 0;
     }
 
-    /* BODY (chair back + torso) */
+    /* BODY */
     .body {
-      width: 72px;
-      height: 68px;
-      border: 2.5px solid rgba(255,255,255,0.75);
+      border: 2.5px solid rgba(255,255,255,0.85);
       border-radius: 8px 8px 0 0;
       background: transparent;
       flex-shrink: 0;
     }
 
-    /* CHAIR BASE — extends below body */
-    .chair-base {
-      width: 88px;
-      height: 10px;
-      background: rgba(255,255,255,0.15);
+    /* CHAIR SEAT */
+    .chair-seat {
+      background: rgba(255,255,255,0.12);
       border-radius: 0 0 4px 4px;
       flex-shrink: 0;
     }
+
+    /* Row 0 — front, biggest */
+    .row-0 .head        { width: 44px; height: 44px; }
+    .row-0 .body        { width: 72px; height: 62px; margin-top: 2px; }
+    .row-0 .chair-seat  { width: 88px; height: 10px; }
+
+    /* Row 1 */
+    .row-1 .head        { width: 38px; height: 38px; }
+    .row-1 .body        { width: 62px; height: 54px; margin-top: 2px; }
+    .row-1 .chair-seat  { width: 76px; height: 9px; }
+
+    /* Row 2 */
+    .row-2 .head        { width: 32px; height: 32px; }
+    .row-2 .body        { width: 52px; height: 46px; margin-top: 1px; }
+    .row-2 .chair-seat  { width: 64px; height: 8px; }
+
+    /* Row 3 */
+    .row-3 .head        { width: 26px; height: 26px; }
+    .row-3 .body        { width: 42px; height: 38px; margin-top: 1px; }
+    .row-3 .chair-seat  { width: 52px; height: 7px; }
+
+    /* Row 4 — back, smallest */
+    .row-4 .head        { width: 20px; height: 20px; }
+    .row-4 .body        { width: 34px; height: 30px; margin-top: 1px; }
+    .row-4 .chair-seat  { width: 42px; height: 6px; }
+
+    /* Aisle gap in rows */
+    .aisle { width: 40px; flex-shrink: 0; }
   </style>
 </head>
 <body>
 
   <!-- SCREEN -->
   <div class="screen-section">
-    <div class="screen-label">screen</div>
+    <button class="exit-btn" id="exitBtn" onclick="exitVideo()">✕ EXIT</button>
 
-    <!-- Overlay: load UI lives here, on the screen -->
     <div class="screen-overlay" id="overlay">
       <h2>Virtual Cinema</h2>
       <div class="overlay-controls">
         <input id="videoInput" placeholder="Paste YouTube link or video ID…" />
-        <button onclick="loadVideo()">Play</button>
+        <button onclick="loadVideo()">▶ Play</button>
       </div>
     </div>
 
@@ -212,11 +271,94 @@
 
   <!-- AUDIENCE -->
   <div class="audience-section">
-    <div class="person"><div class="head"></div><div class="body"></div><div class="chair-base"></div></div>
-    <div class="person"><div class="head"></div><div class="body"></div><div class="chair-base"></div></div>
-    <div class="person"><div class="head"></div><div class="body"></div><div class="chair-base"></div></div>
-    <div class="person"><div class="head"></div><div class="body"></div><div class="chair-base"></div></div>
-    <div class="person"><div class="head"></div><div class="body"></div><div class="chair-base"></div></div>
+
+    <svg class="floor-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
+      <!-- Converging perspective lines -->
+      <line x1="50" y1="0" x2="0"   y2="100" stroke="rgba(255,255,255,0.03)" stroke-width="0.3"/>
+      <line x1="50" y1="0" x2="20"  y2="100" stroke="rgba(255,255,255,0.03)" stroke-width="0.3"/>
+      <line x1="50" y1="0" x2="40"  y2="100" stroke="rgba(255,255,255,0.03)" stroke-width="0.3"/>
+      <line x1="50" y1="0" x2="60"  y2="100" stroke="rgba(255,255,255,0.03)" stroke-width="0.3"/>
+      <line x1="50" y1="0" x2="80"  y2="100" stroke="rgba(255,255,255,0.03)" stroke-width="0.3"/>
+      <line x1="50" y1="0" x2="100" y2="100" stroke="rgba(255,255,255,0.03)" stroke-width="0.3"/>
+      <!-- Horizontal depth lines -->
+      <line x1="0" y1="30" x2="100" y2="30" stroke="rgba(255,255,255,0.025)" stroke-width="0.3"/>
+      <line x1="0" y1="55" x2="100" y2="55" stroke="rgba(255,255,255,0.025)" stroke-width="0.3"/>
+      <line x1="0" y1="75" x2="100" y2="75" stroke="rgba(255,255,255,0.025)" stroke-width="0.3"/>
+      <line x1="0" y1="90" x2="100" y2="90" stroke="rgba(255,255,255,0.025)" stroke-width="0.3"/>
+    </svg>
+
+    <div class="rows-container">
+      <!-- Row 0: front -->
+      <div class="row row-0">
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="aisle"></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+      </div>
+      <!-- Row 1 -->
+      <div class="row row-1">
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="aisle"></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+      </div>
+      <!-- Row 2 -->
+      <div class="row row-2">
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="aisle"></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+      </div>
+      <!-- Row 3 -->
+      <div class="row row-3">
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="aisle"></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+      </div>
+      <!-- Row 4: back -->
+      <div class="row row-4">
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="aisle"></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+        <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -250,11 +392,21 @@
       if (!player) { alert("Player not ready yet."); return; }
       if (id) {
         player.loadVideoById(id);
-        // Hide the overlay so the video takes over the screen
         document.getElementById('overlay').classList.add('hidden');
+        document.getElementById('exitBtn').classList.add('visible');
       } else {
         alert("Couldn't find a valid YouTube video ID.");
       }
+    }
+
+    function exitVideo() {
+      if (player) {
+        player.stopVideo();
+        player.cueVideoById('');
+      }
+      document.getElementById('videoInput').value = '';
+      document.getElementById('overlay').classList.remove('hidden');
+      document.getElementById('exitBtn').classList.remove('visible');
     }
   </script>
 </body>
