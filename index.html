@@ -5,7 +5,11 @@
 <title>Virtual Cinema</title>
 
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
 body {
   height: 100vh;
@@ -14,44 +18,20 @@ body {
   background: radial-gradient(circle at 50% 20%, #151515 0%, #050505 60%, #000 100%);
 }
 
-/* ───────── CINEMA STAGE PERSPECTIVE ───────── */
-body {
-  perspective: 1200px;
-}
-
-/* wrapper gives subtle camera tilt */
-.screen-section,
-.audience-section {
-  transform: rotateX(6deg);
-  transform-origin: top center;
-}
-
-/* ───────── SCREEN ───────── */
+/* ───────────────── SCREEN ───────────────── */
 .screen-section {
   position: relative;
   height: 58%;
   margin: 12px 12px 0 12px;
+  background: #000;
   border-radius: 10px;
   overflow: hidden;
 
-  background: #000;
   border: 1px solid rgba(255,255,255,0.08);
 
   box-shadow:
-    0 30px 80px rgba(0,0,0,0.8),
-    0 0 120px rgba(255,40,40,0.08);
-}
-
-/* cinematic glow spill */
-.screen-section::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 50% 100%,
-    rgba(255,50,50,0.18),
-    transparent 60%);
-  pointer-events: none;
-  z-index: 2;
+    0 40px 90px rgba(0,0,0,0.85),
+    0 0 80px rgba(255,40,40,0.08);
 }
 
 #player {
@@ -59,16 +39,32 @@ body {
   height: 100%;
 }
 
-/* vignette inside screen */
-.screen-section::after {
+/* screen light spill downward */
+.screen-section::before {
   content: '';
   position: absolute;
   inset: 0;
-  box-shadow: inset 0 0 120px rgba(0,0,0,0.6);
+  background: radial-gradient(circle at 50% 100%,
+    rgba(255,60,60,0.18),
+    transparent 60%);
   pointer-events: none;
 }
 
-/* ───────── OVERLAY ───────── */
+/* stage lip (fixes flatness) */
+.screen-section::after {
+  content: '';
+  position: absolute;
+  bottom: -18px;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: linear-gradient(to bottom,
+    rgba(0,0,0,0.7),
+    transparent);
+  filter: blur(2px);
+}
+
+/* ───────────────── OVERLAY ───────────────── */
 .screen-overlay {
   position: absolute;
   inset: 0;
@@ -80,13 +76,12 @@ body {
 
   background: rgba(0,0,0,0.88);
   z-index: 5;
-  transition: 0.4s;
 }
 
 .screen-overlay h2 {
   letter-spacing: 10px;
-  font-weight: 300;
   color: rgba(255,255,255,0.55);
+  font-weight: 300;
 }
 
 .overlay-controls {
@@ -96,7 +91,7 @@ body {
 
 .overlay-controls input {
   width: 320px;
-  padding: 10px 12px;
+  padding: 10px;
   background: #111;
   border: 1px solid #333;
   color: white;
@@ -105,12 +100,11 @@ body {
 .overlay-controls button {
   background: #ff3b3b;
   border: none;
-  color: white;
   padding: 10px 18px;
+  color: white;
   cursor: pointer;
 }
 
-/* exit button */
 .exit-btn {
   position: absolute;
   top: 12px;
@@ -129,7 +123,7 @@ body {
   pointer-events: all;
 }
 
-/* ───────── AUDIENCE ───────── */
+/* ───────────────── AUDIENCE ───────────────── */
 .audience-section {
   height: 42%;
   margin: 0 12px 12px;
@@ -138,36 +132,14 @@ body {
 
   background:
     radial-gradient(circle at 50% 0%,
-      rgba(255,60,60,0.08),
-      transparent 60%),
-    linear-gradient(to bottom, #0a0a0a, #050505);
+      rgba(255,60,60,0.10),
+      transparent 55%),
+    linear-gradient(to bottom, #0a0a0a, #000);
 
   border-radius: 0 0 12px 12px;
 }
 
-/* floor curvature illusion */
-.audience-section::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at bottom,
-    rgba(255,255,255,0.04),
-    transparent 60%);
-  pointer-events: none;
-}
-
-/* film grain overlay */
-.audience-section::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.15'/%3E%3C/svg%3E");
-  opacity: 0.05;
-  mix-blend-mode: overlay;
-  pointer-events: none;
-}
-
-/* ───────── SEATING DEPTH ───────── */
+/* perspective ONLY here (not global) */
 .rows-container {
   position: absolute;
   bottom: 0;
@@ -175,36 +147,38 @@ body {
   display: flex;
   flex-direction: column-reverse;
   align-items: center;
+
+  perspective: 900px;
   padding-bottom: 10px;
 }
 
-/* stronger depth falloff */
 .row {
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  transition: transform 0.3s;
+  transform-origin: bottom center;
 }
 
-/* deeper perspective scaling + fade */
-.row-0 { transform: scale(1.05); opacity: 1; }
-.row-1 { transform: scale(0.88); opacity: 0.85; }
-.row-2 { transform: scale(0.72); opacity: 0.65; }
-.row-3 { transform: scale(0.58); opacity: 0.45; }
-.row-4 { transform: scale(0.46); opacity: 0.28; }
+/* proper depth (not flat scaling alone) */
+.row-0 { transform: translateZ(0px) scale(1); opacity: 1; }
+.row-1 { transform: translateZ(-40px) scale(0.92); opacity: 0.9; }
+.row-2 { transform: translateZ(-90px) scale(0.82); opacity: 0.72; }
+.row-3 { transform: translateZ(-150px) scale(0.70); opacity: 0.52; }
+.row-4 { transform: translateZ(-220px) scale(0.60); opacity: 0.38; }
 
-/* aisle spacing feels like depth gap */
-.aisle { width: 60px; }
+.aisle {
+  width: 60px;
+}
 
-/* ───────── PEOPLE (more 3D) ───────── */
+/* ───────────────── PEOPLE (more grounded lighting) ───────────────── */
 .person {
   display: flex;
   flex-direction: column;
   align-items: center;
-  filter: drop-shadow(0 6px 6px rgba(0,0,0,0.6));
+  filter: drop-shadow(0 6px 6px rgba(0,0,0,0.7));
 }
 
-/* heads */
+/* head */
 .head {
   border-radius: 50%;
   border: 2px solid rgba(255,255,255,0.9);
@@ -218,17 +192,13 @@ body {
   background: linear-gradient(to bottom, #111, #000);
 }
 
-/* chair */
+/* seat */
 .chair-seat {
   background: linear-gradient(to bottom, #222, #111);
-  border-radius: 2px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.5);
 }
 
-/* subtle size variation already works — enhance with glow */
-.row-0 .head, .row-0 .body { box-shadow: 0 0 6px rgba(255,255,255,0.05); }
-
-/* keep your sizing rules (unchanged for consistency) */
+/* sizing (unchanged so your layout stays intact) */
 .row-0 .head { width: 44px; height: 44px; }
 .row-0 .body { width: 72px; height: 62px; margin-top: 2px; }
 .row-0 .chair-seat { width: 88px; height: 10px; }
@@ -271,8 +241,40 @@ body {
 <div class="audience-section">
   <div class="rows-container">
 
-    <!-- (your rows unchanged structurally) -->
-    <!-- keep your existing HTML rows here exactly as-is -->
+    <div class="row row-0">
+      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+      <div class="aisle"></div>
+      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+    </div>
+
+    <div class="row row-1">
+      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+      <div class="aisle"></div>
+      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+    </div>
+
+    <div class="row row-2">
+      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+      <div class="aisle"></div>
+      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+    </div>
+
+    <div class="row row-3">
+      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+      <div class="aisle"></div>
+      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+    </div>
+
+    <div class="row row-4">
+      <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
+    </div>
 
   </div>
 </div>
