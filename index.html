@@ -52,7 +52,6 @@ input {
   justify-content: center;
 }
 
-/* room display */
 #roomDisplay {
   position: absolute;
   top: 20px;
@@ -78,7 +77,24 @@ input {
   </div>
 </div>
 
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
 <script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAcJZLOi-tgeCoVNCrr7sEiJQb9G4sjYRE",
+  authDomain: "cinemaclub-e264a.firebaseapp.com",
+  databaseURL: "https://cinemaclub-e264a-default-rtdb.firebaseio.com",
+  projectId: "cinemaclub-e264a",
+  storageBucket: "cinemaclub-e264a.firebasestorage.app",
+  messagingSenderId: "180570080913",
+  appId: "1:180570080913:web:3689a88221571527cce130"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
 function generateCode(length = 5) {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   let code = "";
@@ -88,25 +104,21 @@ function generateCode(length = 5) {
   return code;
 }
 
-// simple placeholder state (future multiplayer foundation)
-let roomState = {
-  videoId: null,
-  playing: false,
-  time: 0,
-  reactions: []
-};
-
 function createRoom() {
   const code = generateCode();
 
-  console.log("Created room:", code);
+  // create room in Firebase first
+  db.ref("rooms/" + code).set({
+    videoId: null,
+    playing: false,
+    createdAt: Date.now()
+  });
 
   window.location.href = `cinema.html?room=${code}`;
 }
 
 function joinRoom() {
   const code = document.getElementById("roomCode").value.trim().toUpperCase();
-
   if (!code) return;
 
   window.location.href = `cinema.html?room=${code}`;
