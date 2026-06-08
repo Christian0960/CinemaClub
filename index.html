@@ -507,6 +507,11 @@ body {
   </div>
 </div>
 
+  <!-- ───────────── REACTION SOUNDS ───────────── -->
+<audio id="clapSound" src="clap.mp3" preload="auto"></audio>
+<audio id="cheerSound" src="cheer.mp3" preload="auto"></audio>
+<audio id="booSound" src="boo.mp3" preload="auto"></audio>
+
 <script>
 let player;
 let tag = document.createElement('script');
@@ -562,16 +567,29 @@ function sendReaction(reaction) {
     .getElementById("reactionMenu")
     .classList.remove("open");
 
+  // popup text
   const popup = document.createElement("div");
-
   popup.className = "reaction-popup";
   popup.textContent = reaction;
-
   document.body.appendChild(popup);
 
-  setTimeout(() => {
-    popup.remove();
-  }, 2000);
+  setTimeout(() => popup.remove(), 2000);
+
+  // ───────────── SOUND PLAYBACK ─────────────
+  let sound;
+
+  if (reaction === "Clap") {
+    sound = document.getElementById("clapSound");
+  } else if (reaction === "Cheer") {
+    sound = document.getElementById("cheerSound");
+  } else if (reaction === "Boo") {
+    sound = document.getElementById("booSound");
+  }
+
+  if (sound) {
+    sound.currentTime = 0;
+    sound.play();
+  }
 }
 
 document.addEventListener("click", (e) => {
