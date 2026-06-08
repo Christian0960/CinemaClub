@@ -355,10 +355,23 @@ body {
   }
 }
 
+  #roomDisplay {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  color: rgba(255,255,255,0.6);
+  font-size: 14px;
+  z-index: 50;
+}
+
 </style>
 </head>
 
 <body>
+
+  <div id="roomDisplay"></div>
+
+  
 
 <div class="screen-section">
   <button class="exit-btn" id="exitBtn" onclick="exitVideo()">✕ EXIT</button>
@@ -514,100 +527,114 @@ body {
 
 <script>
 
+window.addEventListener("DOMContentLoaded", () => {
+
+  // ───────────────── ROOM CODE ─────────────────
   const roomCode = new URLSearchParams(window.location.search).get("room");
-console.log("Room code:", roomCode);
-  
-let player;
-let tag = document.createElement('script');
-tag.src = "https://www.youtube.com/iframe_api";
-document.body.appendChild(tag);
 
-function onYouTubeIframeAPIReady() {
-  player = new YT.Player('player', {
-    width: '100%',
-    height: '100%',
-    videoId: '',
-    playerVars: { rel: 0, controls: 1 }
+  const display = document.getElementById("roomDisplay");
+  if (display) {
+    display.textContent = roomCode ? `ROOM: ${roomCode}` : "NO ROOM";
+  }
+
+  console.log("Room code:", roomCode);
+
+  // ───────────────── YOUTUBE API ─────────────────
+  let player;
+
+  let tag = document.createElement('script');
+  tag.src = "https://www.youtube.com/iframe_api";
+  document.body.appendChild(tag);
+
+  window.onYouTubeIframeAPIReady = function () {
+    player = new YT.Player('player', {
+      width: '100%',
+      height: '100%',
+      videoId: '',
+      playerVars: { rel: 0, controls: 1 }
+    });
+  };
+
+  // ───────────────── VIDEO HELPERS ─────────────────
+  function extractVideoId(url) {
+    let match = url.match(/[?&]v=([^&]+)/);
+    if (match) return match[1];
+
+    match = url.match(/youtu\.be\/([^?&]+)/);
+    if (match) return match[1];
+
+    if (/^[a-zA-Z0-9_-]{11}$/.test(url)) return url;
+
+    return null;
+  }
+
+  window.loadVideo = function () {
+    const input = document.getElementById("videoInput").value.trim();
+    const id = extractVideoId(input);
+
+    if (!player) return alert("Player not ready yet.");
+
+    if (id) {
+      player.loadVideoById(id);
+
+      document.getElementById('overlay').classList.add('hidden');
+      document.getElementById('exitBtn').classList.add('visible');
+    }
+  };
+
+  window.exitVideo = function () {
+    if (player) player.stopVideo();
+
+    document.getElementById('overlay').classList.remove('hidden');
+    document.getElementById('exitBtn').classList.remove('visible');
+  };
+
+  // ───────────────── REACTIONS ─────────────────
+  window.toggleReactions = function () {
+    document.getElementById("reactionMenu").classList.toggle("open");
+  };
+
+  window.sendReaction = function (reaction) {
+
+    document.getElementById("reactionMenu").classList.remove("open");
+
+    // popup text
+    const popup = document.createElement("div");
+    popup.className = "reaction-popup";
+    popup.textContent = reaction;
+    document.body.appendChild(popup);
+
+    setTimeout(() => popup.remove(), 2000);
+
+    // sound system
+    let sound;
+
+    if (reaction === "Clap") {
+      sound = document.getElementById("clapSound");
+    } else if (reaction === "Cheer") {
+      sound = document.getElementById("cheerSound");
+    } else if (reaction === "Boo") {
+      sound = document.getElementById("booSound");
+    }
+
+    if (sound) {
+      sound.currentTime = 0;
+      sound.play().catch(() => {});
+    }
+  };
+
+  // close reaction menu when clicking outside
+  document.addEventListener("click", (e) => {
+    const menu = document.getElementById("reactionMenu");
+    const container = document.querySelector(".reactions-container");
+
+    if (container && !container.contains(e.target)) {
+      menu.classList.remove("open");
+    }
   });
-}
-
-function extractVideoId(url) {
-  let match = url.match(/[?&]v=([^&]+)/);
-  if (match) return match[1];
-  match = url.match(/youtu\.be\/([^?&]+)/);
-  if (match) return match[1];
-  if (/^[a-zA-Z0-9_-]{11}$/.test(url)) return url;
-  return null;
-}
-
-function loadVideo() {
-  const input = document.getElementById("videoInput").value.trim();
-  const id = extractVideoId(input);
-
-  if (!player) return alert("Player not ready yet.");
-
-  if (id) {
-    player.loadVideoById(id);
-    document.getElementById('overlay').classList.add('hidden');
-    document.getElementById('exitBtn').classList.add('visible');
-  }
-}
-
-function exitVideo() {
-  player.stopVideo();
-  document.getElementById('overlay').classList.remove('hidden');
-  document.getElementById('exitBtn').classList.remove('visible');
-}
-
-  function toggleReactions() {
-  document
-    .getElementById("reactionMenu")
-    .classList.toggle("open");
-}
-
-function sendReaction(reaction) {
-
-  document
-    .getElementById("reactionMenu")
-    .classList.remove("open");
-
-  // popup text
-  const popup = document.createElement("div");
-  popup.className = "reaction-popup";
-  popup.textContent = reaction;
-  document.body.appendChild(popup);
-
-  setTimeout(() => popup.remove(), 2000);
-
-  // ───────────── SOUND PLAYBACK ─────────────
-  let sound;
-
-  if (reaction === "Clap") {
-    sound = document.getElementById("clapSound");
-  } else if (reaction === "Cheer") {
-    sound = document.getElementById("cheerSound");
-  } else if (reaction === "Boo") {
-    sound = document.getElementById("booSound");
-  }
-
-  if (sound) {
-    sound.currentTime = 0;
-    sound.play();
-  }
-}
-
-document.addEventListener("click", (e) => {
-
-  const menu = document.getElementById("reactionMenu");
-  const container = document.querySelector(".reactions-container");
-
-  if (!container.contains(e.target)) {
-    menu.classList.remove("open");
-  }
 
 });
-  
-</script>
 
+</script>
 </body>
 </html>
