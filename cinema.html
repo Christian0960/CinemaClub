@@ -3,158 +3,104 @@
 <head>
 <meta charset="UTF-8" />
 <title>CinemaClub</title>
-
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-
 body {
-  height: 100vh;
-  overflow: hidden;
+  height: 100vh; overflow: hidden;
   font-family: 'Courier New', monospace;
   background: radial-gradient(circle at 50% 20%, #151515 0%, #050505 60%, #000 100%);
 }
-
 .screen-section {
-  position: relative;
-  height: 58%;
-  margin: 12px 12px 0 12px;
-  border-radius: 14px;
-  overflow: hidden;
-  background: #000;
-  border: 1px solid rgba(255,255,255,0.08);
-  transform: perspective(1200px) rotateX(-6deg);
-  transform-origin: top center;
-  box-shadow:
-    0 80px 180px rgba(0,0,0,0.95),
-    inset 0 0 80px rgba(255,255,255,0.05),
-    0 0 25px rgba(120, 80, 255, 0.35),
-    0 0 60px rgba(80, 180, 255, 0.25);
-  outline: 1px solid rgba(120, 80, 255, 0.25);
+  position: relative; height: 58%;
+  margin: 12px 12px 0 12px; border-radius: 14px; overflow: hidden;
+  background: #000; border: 1px solid rgba(255,255,255,0.08);
+  transform: perspective(1200px) rotateX(-6deg); transform-origin: top center;
+  box-shadow: 0 80px 180px rgba(0,0,0,0.95), inset 0 0 80px rgba(255,255,255,0.05),
+    0 0 25px rgba(120,80,255,0.35), 0 0 60px rgba(80,180,255,0.25);
+  outline: 1px solid rgba(120,80,255,0.25);
 }
-
 #player { width: 100%; height: 100%; position: relative; z-index: 1; }
-
 .screen-section::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 2;
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 2;
   background: linear-gradient(to bottom, rgba(255,255,255,0.06), transparent 40%, rgba(0,0,0,0.5));
 }
-
 .screen-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 14px;
-  background: rgba(0,0,0,0.9);
-  z-index: 5;
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  justify-content: center; align-items: center; gap: 14px;
+  background: rgba(0,0,0,0.9); z-index: 5;
   transition: opacity 0.4s ease, transform 0.4s ease;
 }
 .screen-overlay.hidden { opacity: 0; pointer-events: none; transform: scale(1.05); }
 .screen-overlay h2 { letter-spacing: 10px; color: rgba(255,255,255,0.55); font-weight: 300; }
-
 .overlay-controls { display: flex; gap: 10px; }
-.overlay-controls input {
-  width: 320px; padding: 10px;
-  background: #111; border: 1px solid #333; color: white;
-}
-.overlay-controls button {
-  background: #ff3b3b; border: none; padding: 10px 18px; color: white; cursor: pointer;
-}
+.overlay-controls input { width: 320px; padding: 10px; background: #111; border: 1px solid #333; color: white; }
+.overlay-controls button { background: #ff3b3b; border: none; padding: 10px 18px; color: white; cursor: pointer; }
 .viewer-waiting { color: rgba(255,255,255,0.4); font-size: 13px; letter-spacing: 3px; }
-
 .exit-btn {
   position: absolute; top: 12px; right: 12px; z-index: 10;
-  opacity: 0; pointer-events: none;
-  padding: 6px 10px;
+  opacity: 0; pointer-events: none; padding: 6px 10px;
   background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15); color: white; cursor: pointer;
 }
 .exit-btn.visible { opacity: 1; pointer-events: all; }
-
 .audience-section {
-  height: 42%;
-  margin: 0 12px 12px;
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(to bottom, #0a0a0a, #000);
-  border-radius: 0 0 12px 12px;
-  transform: perspective(1200px) rotateX(8deg);
-  transform-origin: top center;
+  height: 42%; margin: 0 12px 12px; position: relative; overflow: hidden;
+  background: linear-gradient(to bottom, #0a0a0a, #000); border-radius: 0 0 12px 12px;
+  transform: perspective(1200px) rotateX(8deg); transform-origin: top center;
 }
-
 .rows-container {
   position: absolute; bottom: 0; left: 120px; right: 120px;
   display: flex; flex-direction: column-reverse; align-items: stretch;
   perspective: 900px; padding: 10px 0;
 }
-
 .row { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; margin-bottom: 6px; }
 .row-0 { transform: translateX(0px) translateZ(0px) scale(1); opacity: 1; }
 .row-1 { transform: translateZ(-40px) scale(0.92); opacity: 0.9; }
 .row-2 { transform: translateZ(-90px) scale(0.82); opacity: 0.72; }
 .row-3 { transform: translateZ(-150px) scale(0.70); opacity: 0.52; }
 .row-4 { transform: translateZ(-220px) scale(0.60); opacity: 0.38; }
-
 .person { display: flex; flex-direction: column; align-items: center; filter: drop-shadow(0 6px 6px rgba(0,0,0,0.7)); }
 .head { border-radius: 50%; border: 2px solid rgba(255,255,255,0.9); background: radial-gradient(circle at 30% 30%, #222, #000); }
 .body { border: 2px solid rgba(255,255,255,0.85); border-radius: 6px; background: linear-gradient(to bottom, #111, #000); }
 .chair-seat { background: linear-gradient(to bottom, #222, #111); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-
-.row-0 .head { width: 44px; height: 44px; } .row-0 .body { width: 72px; height: 62px; } .row-0 .chair-seat { width: 88px; height: 10px; }
-.row-1 .head { width: 38px; height: 38px; } .row-1 .body { width: 62px; height: 54px; } .row-1 .chair-seat { width: 76px; height: 9px; }
-.row-2 .head { width: 32px; height: 32px; } .row-2 .body { width: 52px; height: 46px; } .row-2 .chair-seat { width: 64px; height: 8px; }
-.row-3 .head { width: 26px; height: 26px; } .row-3 .body { width: 42px; height: 38px; } .row-3 .chair-seat { width: 52px; height: 7px; }
-.row-4 .head { width: 20px; height: 20px; } .row-4 .body { width: 34px; height: 30px; } .row-4 .chair-seat { width: 42px; height: 6px; }
-
+.row-0 .head{width:44px;height:44px} .row-0 .body{width:72px;height:62px} .row-0 .chair-seat{width:88px;height:10px}
+.row-1 .head{width:38px;height:38px} .row-1 .body{width:62px;height:54px} .row-1 .chair-seat{width:76px;height:9px}
+.row-2 .head{width:32px;height:32px} .row-2 .body{width:52px;height:46px} .row-2 .chair-seat{width:64px;height:8px}
+.row-3 .head{width:26px;height:26px} .row-3 .body{width:42px;height:38px} .row-3 .chair-seat{width:52px;height:7px}
+.row-4 .head{width:20px;height:20px} .row-4 .body{width:34px;height:30px} .row-4 .chair-seat{width:42px;height:6px}
 .reactions-container { position: absolute; bottom: 35px; left: 35px; transform: translateX(8px); z-index: 20; }
 .reaction-toggle {
-  width: 70px; height: 70px;
-  border: 3px solid rgba(255,255,255,0.15); border-radius: 14px;
+  width: 70px; height: 70px; border: 3px solid rgba(255,255,255,0.15); border-radius: 14px;
   background: rgba(15,15,15,0.9); color: white; font-size: 28px; cursor: pointer;
   box-shadow: 0 10px 25px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,255,255,0.03);
   transition: all 0.2s ease;
 }
 .reaction-toggle:hover { transform: translateY(-2px); background: rgba(25,25,25,0.95); }
-
 .reaction-menu {
-  position: absolute; bottom: 80px; left: 0;
-  display: flex; flex-direction: column; gap: 8px;
-  opacity: 0; pointer-events: none; transform: translateY(10px);
-  transition: all 0.25s ease;
+  position: absolute; bottom: 80px; left: 0; display: flex; flex-direction: column; gap: 8px;
+  opacity: 0; pointer-events: none; transform: translateY(10px); transition: all 0.25s ease;
 }
 .reaction-menu.open { opacity: 1; pointer-events: auto; transform: translateY(0); }
-
 .reaction-btn {
-  width: 100px; padding: 12px;
-  border: 1px solid rgba(255,255,255,0.12); border-radius: 12px;
+  width: 100px; padding: 12px; border: 1px solid rgba(255,255,255,0.12); border-radius: 12px;
   background: rgba(20,20,20,0.95); color: white; cursor: pointer;
   box-shadow: 0 8px 20px rgba(0,0,0,0.4); transition: all 0.2s ease;
 }
 .reaction-btn:hover { transform: translateX(4px); background: rgba(35,35,35,0.95); }
-
 .reaction-popup {
-  position: fixed; bottom: 180px; left: 120px;
-  font-size: 40px; color: white; pointer-events: none;
-  animation: floatUp 2s forwards;
+  position: fixed; bottom: 180px; left: 120px; font-size: 40px; color: white;
+  pointer-events: none; animation: floatUp 2s forwards;
 }
 @keyframes floatUp {
   0%   { opacity: 0; transform: translateY(20px) scale(0.8); }
   20%  { opacity: 1; }
   100% { opacity: 0; transform: translateY(-100px) scale(1.3); }
 }
-
 #roomDisplay { position: absolute; top: 20px; left: 20px; color: rgba(255,255,255,0.6); font-size: 14px; z-index: 50; }
 </style>
 </head>
 <body>
 
 <div id="roomDisplay"></div>
-
 <div class="screen-section">
   <button class="exit-btn" id="exitBtn" onclick="exitVideo()">✕ EXIT</button>
   <div class="screen-overlay" id="overlay">
@@ -173,7 +119,6 @@ body {
     </div>
     <button class="reaction-toggle" onclick="toggleReactions()">React</button>
   </div>
-
   <div class="rows-container">
     <div class="row row-0">
       <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
@@ -304,23 +249,22 @@ window.addEventListener("DOMContentLoaded", () => {
   const roomCode = new URLSearchParams(window.location.search).get("room");
   document.getElementById("roomDisplay").textContent = roomCode ? `ROOM: ${roomCode}` : "NO ROOM";
 
-  const roomRef = db.ref("rooms/" + roomCode);
-  const hostRef = db.ref("rooms/" + roomCode + "/host");
+  const roomRef  = db.ref("rooms/" + roomCode);
+  const hostRef  = db.ref("rooms/" + roomCode + "/host");
 
   const myId = crypto.randomUUID();
-  let isHost = false;
-  let player = null;
+  let isHost      = false;
+  let player      = null;
   let playerReady = false;
-
-  // The key state for viewer: tracks what video is currently loaded
-  // in the player so we don't re-loadVideoById unnecessarily.
-  let loadedVideoId = null;
-
-  // Pending sync data: if Firebase fires before player is ready,
-  // we store it and apply it once onPlayerReady fires.
   let pendingSync = null;
 
-  // ── Step 1: Claim host, THEN build player with correct controls ──
+  // Track the videoId we've already loaded so we don't re-cue on every Firebase tick
+  let loadedVideoId = null;
+
+  // Track the last "playing" state we commanded so we don't spam play/pause
+  let lastCommandedPlaying = null;
+
+  // ── 1. Claim host, then build player ──
   hostRef.transaction(current => {
     if (current === null) return myId;
     return current;
@@ -329,7 +273,6 @@ window.addEventListener("DOMContentLoaded", () => {
     isHost = snapshot.val() === myId;
     console.log(isHost ? "HOST" : "VIEWER");
 
-    // Show correct overlay UI
     const ctrl = document.getElementById("overlayControls");
     if (isHost) {
       ctrl.innerHTML = `
@@ -341,24 +284,20 @@ window.addEventListener("DOMContentLoaded", () => {
       ctrl.innerHTML = `<p class="viewer-waiting">WAITING FOR HOST…</p>`;
     }
 
-    // Step 2: Load YouTube IFrame API now that we know our role
     const tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
     document.body.appendChild(tag);
   });
 
-  // ── Step 3: Build player with correct controls ──
+  // ── 2. Build player after API ready ──
   window.onYouTubeIframeAPIReady = function () {
     player = new YT.Player('player', {
-      width: '100%',
-      height: '100%',
-      videoId: '',
+      width: '100%', height: '100%', videoId: '',
       playerVars: {
         rel: 0,
         controls: isHost ? 1 : 0,
         disablekb: isHost ? 0 : 1,
-        modestbranding: 1,
-        // autoplay:1 causes issues on load with no video — leave off
+        modestbranding: 1
       },
       events: {
         onReady: onPlayerReady,
@@ -369,77 +308,63 @@ window.addEventListener("DOMContentLoaded", () => {
 
   function onPlayerReady() {
     playerReady = true;
-    // If Firebase already sent us sync data before player was ready, apply it now
     if (pendingSync) {
       applySync(pendingSync);
       pendingSync = null;
     }
   }
 
-  // Host pushes state on play/pause events for instant viewer response
+  // Host: push on play/pause for instant viewer response
   function onPlayerStateChange(event) {
     if (!isHost) return;
-    const s = event.data;
-    if (s === YT.PlayerState.PLAYING || s === YT.PlayerState.PAUSED) {
+    if (event.data === YT.PlayerState.PLAYING || event.data === YT.PlayerState.PAUSED) {
       pushState();
     }
   }
 
-  // ── Firebase listener ──
+  // ── 3. Firebase listener ──
   roomRef.on("value", (snap) => {
     const data = snap.val();
     if (!data) return;
-
-    if (!playerReady) {
-      // Player not ready yet — store and apply once it is
-      pendingSync = data;
-      return;
-    }
-
+    if (!playerReady) { pendingSync = data; return; }
     applySync(data);
   });
 
-  // ── Core sync logic — only called when player is confirmed ready ──
+  // ── 4. Core sync — only runs when playerReady ──
   function applySync(data) {
-    // Show/hide overlay
-    if (data.videoId) {
-      document.getElementById("overlay").classList.add("hidden");
-      document.getElementById("exitBtn").classList.add("visible");
-    } else {
+
+    // Handle video cleared
+    if (!data.videoId) {
       document.getElementById("overlay").classList.remove("hidden");
       document.getElementById("exitBtn").classList.remove("visible");
       loadedVideoId = null;
+      lastCommandedPlaying = null;
       return;
     }
 
-    // ── Load the video if it changed ──
-    // We use cueVideoById for viewers (loads but does NOT autoplay yet)
-    // and loadVideoById for host (loads and plays immediately).
-    // This prevents the viewer from starting before we've synced the timestamp.
+    document.getElementById("overlay").classList.add("hidden");
+    document.getElementById("exitBtn").classList.add("visible");
+
+    // ── New video ──
     if (data.videoId !== loadedVideoId) {
       loadedVideoId = data.videoId;
+      lastCommandedPlaying = null;
 
       if (isHost) {
-        // Host: just load it — YouTube controls handle play/pause
-        const currentId = (() => { try { return player.getVideoData().video_id; } catch(e) { return ""; } })();
-        if (currentId !== data.videoId) {
-          player.loadVideoById(data.videoId);
-        }
+        const curId = (() => { try { return player.getVideoData().video_id; } catch(e) { return ""; } })();
+        if (curId !== data.videoId) player.loadVideoById(data.videoId);
       } else {
-        // Viewer: CUE (don't autoplay) so we can seek first, then play
-        // This is the key fix — cueVideoById fires onStateChange CUED (5)
-        // which we handle below to then seek + play at the right time.
+        // Viewers: cue at the correct timestamp so first buffer is at the right spot.
+        // We'll play once state becomes CUED (5) — handled in onPlayerStateChange below.
         const now = Date.now();
-        const elapsed = (now - (data.lastUpdate || now)) / 1000;
-        const targetTime = data.playing ? data.currentTime + elapsed : data.currentTime;
-        player.cueVideoById({ videoId: data.videoId, startSeconds: targetTime });
-        // cueVideoById with startSeconds seeks before buffering starts,
-        // then we call playVideo once it's cued (state 5)
+        const elapsed = data.playing ? (now - (data.lastUpdate || now)) / 1000 : 0;
+        const startAt = Math.max(0, data.currentTime + elapsed);
+        player.cueVideoById({ videoId: data.videoId, startSeconds: startAt });
       }
-      return; // Don't apply play/pause logic this tick — wait for cue/load
+      return; // Don't run play/pause logic this tick — wait for cue/load to settle
     }
 
-    // ── Viewer ongoing sync (video already loaded) ──
+    // ── Viewer ongoing sync ──
     if (!isHost) {
       viewerSync(data);
     }
@@ -448,40 +373,50 @@ window.addEventListener("DOMContentLoaded", () => {
   function viewerSync(data) {
     const state = player.getPlayerState?.();
 
-    // State 5 = CUED: video is ready at our startSeconds, safe to play now
+    // CUED means video is loaded at startSeconds, ready to play — do it once
     if (state === YT.PlayerState.CUED) {
-      if (data.playing) {
+      if (data.playing && lastCommandedPlaying !== true) {
+        lastCommandedPlaying = true;
         player.playVideo();
       }
       return;
     }
 
-    // Don't interfere while buffering — let YouTube handle it
+    // Let buffering finish on its own — don't seek or play/pause during buffer
     if (state === YT.PlayerState.BUFFERING) return;
-
-    // Don't interfere while unstarted
     if (state === YT.PlayerState.UNSTARTED) return;
 
-    // Drift correction
-    const now = Date.now();
-    const elapsed = (now - (data.lastUpdate || now)) / 1000;
-    const targetTime = data.playing ? data.currentTime + elapsed : data.currentTime;
-    const localTime = player.getCurrentTime?.() || 0;
-    const drift = Math.abs(localTime - targetTime);
-
-    if (drift > 4) {
-      player.seekTo(targetTime, true);
+    // ── Play/pause sync ──
+    // Only issue a command if the state has actually changed from what we last commanded.
+    // This prevents the pause→unpause jumpback: we no longer spam playVideo() every tick.
+    if (data.playing && state !== YT.PlayerState.PLAYING && lastCommandedPlaying !== true) {
+      lastCommandedPlaying = true;
+      player.playVideo();
+    } else if (!data.playing && state !== YT.PlayerState.PAUSED && lastCommandedPlaying !== false) {
+      lastCommandedPlaying = false;
+      player.pauseVideo();
     }
 
-    // Play/pause state
-    if (data.playing && state !== YT.PlayerState.PLAYING) {
-      player.playVideo();
-    } else if (!data.playing && state !== YT.PlayerState.PAUSED) {
-      player.pauseVideo();
+    // ── Drift correction — only while actually playing ──
+    // When paused: data.currentTime is the frozen timestamp; viewer is also paused at
+    // roughly the same spot. Don't add elapsed time when paused — that's what caused
+    // the jumpback (elapsed kept growing while paused, making it look like drift).
+    if (data.playing && state === YT.PlayerState.PLAYING) {
+      const now = Date.now();
+      const elapsed = (now - (data.lastUpdate || now)) / 1000;
+      const targetTime = data.currentTime + elapsed;
+      const localTime  = player.getCurrentTime?.() || 0;
+      const drift = localTime - targetTime; // signed: negative = viewer behind
+
+      // Only seek if meaningfully behind or ahead. Give 5s of tolerance to avoid
+      // seek-buffer loops on slower connections.
+      if (Math.abs(drift) > 5) {
+        player.seekTo(targetTime, true);
+      }
     }
   }
 
-  // ── Host pushes current state to Firebase ──
+  // ── Host pushes state ──
   function pushState() {
     if (!player || !isHost || !playerReady) return;
     const state = player.getPlayerState?.();
@@ -494,7 +429,6 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Periodic heartbeat so viewers stay in sync during long playback
   setInterval(pushState, 2000);
 
   // ── Video input ──
@@ -508,17 +442,10 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   window.loadVideo = function () {
-    if (!isHost) return alert("Only the host can load a video.");
-    const input = document.getElementById("videoInput").value.trim();
-    const id = extractVideoId(input);
+    if (!isHost) return;
+    const id = extractVideoId(document.getElementById("videoInput").value.trim());
     if (!id) return alert("Couldn't find a valid YouTube video ID.");
-
-    roomRef.update({
-      videoId: id,
-      playing: true,
-      currentTime: 0,
-      lastUpdate: Date.now()
-    });
+    roomRef.update({ videoId: id, playing: true, currentTime: 0, lastUpdate: Date.now() });
   };
 
   window.exitVideo = function () {
@@ -541,7 +468,6 @@ window.addEventListener("DOMContentLoaded", () => {
     popup.textContent = reaction;
     document.body.appendChild(popup);
     setTimeout(() => popup.remove(), 2000);
-
     const sounds = { Clap: "clapSound", Cheer: "cheerSound", Boo: "booSound" };
     const sound = document.getElementById(sounds[reaction]);
     if (sound) { sound.currentTime = 0; sound.play().catch(() => {}); }
