@@ -51,10 +51,21 @@ input {
   gap: 10px;
   justify-content: center;
 }
+
+/* room display */
+#roomDisplay {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  opacity: 0.6;
+  font-size: 14px;
+}
 </style>
 </head>
 
 <body>
+
+<div id="roomDisplay">No room</div>
 
 <div class="container">
   <h1>CinemaClub</h1>
@@ -77,10 +88,17 @@ function generateCode(length = 5) {
   return code;
 }
 
+// simple placeholder state (future multiplayer foundation)
+let roomState = {
+  videoId: null,
+  playing: false,
+  time: 0,
+  reactions: []
+};
+
 function createRoom() {
   const code = generateCode();
 
-  // later this will write to database
   console.log("Created room:", code);
 
   window.location.href = `cinema.html?room=${code}`;
