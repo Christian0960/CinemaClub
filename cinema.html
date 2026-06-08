@@ -547,33 +547,27 @@ window.addEventListener("DOMContentLoaded", () => {
   // ───────────────── ROOM ─────────────────
   const roomCode = new URLSearchParams(window.location.search).get("room");
   const display = document.getElementById("roomDisplay");
-  const roomRef = db.ref("rooms/" + roomCode);
-
-  const clientId = crypto.randomUUID();
-  let isHost = false;
 
   if (display) {
     display.textContent = roomCode ? `ROOM: ${roomCode}` : "NO ROOM";
   }
 
-  // ───────────────── HOST DETECTION ─────────────────
-  roomRef.once("value").then((snap) => {
-    const data = snap.val();
+  const roomRef = db.ref("rooms/" + roomCode);
+  const hostRef = db.ref("rooms/" + roomCode + "/host");
 
-    if (!data || !data.host) {
-      // first person becomes host
-      roomRef.set({
-        host: clientId,
-        videoId: null,
-        playing: false,
-        currentTime: 0,
-        lastUpdate: Date.now()
-      });
+  const myId = crypto.randomUUID();
+  let isHost = false;
+
+  // ── TRY TO BECOME HOST ──
+  hostRef.transaction(current => {
+    if (current === null) return myId;
+    return current;
+  }, (error, committed, snapshot) => {
+    if (snapshot.val() === myId) {
       isHost = true;
-      console.log("You are HOST");
+      console.log("I am host");
     } else {
-      isHost = data.host === clientId;
-      console.log("Host status:", isHost);
+      console.log("I am viewer");
     }
   });
 
@@ -601,7 +595,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const now = Date.now();
     const elapsed = (now - (data.lastUpdate || now)) / 1000;
 
-    // ── VIDEO LOAD ──
+    // LOAD VIDEO
     if (data.videoId) {
       const current = player.getVideoData().video_id;
 
@@ -613,14 +607,18 @@ window.addEventListener("DOMContentLoaded", () => {
       document.getElementById("exitBtn").classList.add("visible");
     }
 
-    // ── TIMELINE SYNC ──
-    if (typeof data.currentTime === "number") {
+    // ONLY NON-HOSTS SYNC PLAYBACK
+    if (!isHost && typeof data.currentTime === "number") {
 
       const targetTime = data.playing
         ? data.currentTime + elapsed
         : data.currentTime;
 
-      player.seekTo(targetTime, true);
+      const localTime = player.getCurrentTime?.() || 0;
+
+      if (Math.abs(localTime - targetTime) > 1.5) {
+        player.seekTo(targetTime, true);
+      }
 
       if (data.playing) {
         player.playVideo();
@@ -630,47 +628,18 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ───────────────── DRIFT CORRECTION LOOP ─────────────────
-  setInterval(() => {
-    if (!player) return;
-
-    roomRef.once("value").then((snap) => {
-      const data = snap.val();
-      if (!data) return;
-
-      const now = Date.now();
-      const elapsed = (now - (data.lastUpdate || now)) / 1000;
-
-      const expected = data.playing
-        ? data.currentTime + elapsed
-        : data.currentTime;
-
-      const actual = player.getCurrentTime();
-      const drift = Math.abs(expected - actual);
-
-      if (drift > 1.5) {
-        player.seekTo(expected, true);
-      }
-
-      if (data.playing && player.getPlayerState() !== 1) {
-        player.playVideo();
-      }
-
-      if (!data.playing && player.getPlayerState() === 1) {
-        player.pauseVideo();
-      }
-    });
-  }, 2000);
-
-  // ───────────────── HOST HEARTBEAT ─────────────────
-  setInterval(() => {
+  // ───────────────── HOST UPDATES ─────────────────
+  function pushState() {
     if (!player || !isHost) return;
 
     roomRef.update({
       currentTime: player.getCurrentTime(),
+      playing: player.getPlayerState() === YT.PlayerState.PLAYING,
       lastUpdate: Date.now()
     });
-  }, 3000);
+  }
+
+  setInterval(pushState, 1000);
 
   // ───────────────── VIDEO INPUT ─────────────────
   function extractVideoId(url) {
@@ -686,7 +655,7 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   window.loadVideo = function () {
-    if (!isHost) return; // ONLY HOST CAN CONTROL
+    if (!isHost) return alert("Only host can load video");
 
     const input = document.getElementById("videoInput").value.trim();
     const id = extractVideoId(input);
@@ -694,11 +663,11 @@ window.addEventListener("DOMContentLoaded", () => {
     if (!id) return;
 
     roomRef.set({
-      host: clientId,
       videoId: id,
       playing: true,
       currentTime: 0,
-      lastUpdate: Date.now()
+      lastUpdate: Date.now(),
+      host: myId
     });
   };
 
@@ -745,15 +714,6 @@ window.addEventListener("DOMContentLoaded", () => {
       sound.play().catch(() => {});
     }
   };
-
-  document.addEventListener("click", (e) => {
-    const menu = document.getElementById("reactionMenu");
-    const container = document.querySelector(".reactions-container");
-
-    if (container && !container.contains(e.target)) {
-      menu.classList.remove("open");
-    }
-  });
 
 });
 </script>
