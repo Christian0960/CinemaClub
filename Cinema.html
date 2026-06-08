@@ -513,6 +513,10 @@ body {
 <audio id="booSound" src="boo.mp3" preload="auto"></audio>
 
 <script>
+
+  const roomCode = new URLSearchParams(window.location.search).get("room");
+console.log("Room code:", roomCode);
+  
 let player;
 let tag = document.createElement('script');
 tag.src = "https://www.youtube.com/iframe_api";
