@@ -525,21 +525,41 @@ body {
 <audio id="cheerSound" src="cheer.mp3" preload="auto"></audio>
 <audio id="booSound" src="boo.mp3" preload="auto"></audio>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAcJZLOi-tgeCoVNCrr7sEiJQb9G4sjYRE",
+  authDomain: "cinemaclub-e264a.firebaseapp.com",
+  databaseURL: "https://cinemaclub-e264a-default-rtdb.firebaseio.com",
+  projectId: "cinemaclub-e264a",
+  storageBucket: "cinemaclub-e264a.firebasestorage.app",
+  messagingSenderId: "180570080913",
+  appId: "1:180570080913:web:3689a88221571527cce130"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+</script>
+  
 <script>
 
 window.addEventListener("DOMContentLoaded", () => {
 
-  // ───────────────── ROOM CODE ─────────────────
+  // ───────────────── ROOM ─────────────────
   const roomCode = new URLSearchParams(window.location.search).get("room");
-
   const display = document.getElementById("roomDisplay");
+
   if (display) {
     display.textContent = roomCode ? `ROOM: ${roomCode}` : "NO ROOM";
   }
 
+  const roomRef = db.ref("rooms/" + roomCode);
+
   console.log("Room code:", roomCode);
 
-  // ───────────────── YOUTUBE API ─────────────────
+  // ───────────────── YOUTUBE ─────────────────
   let player;
 
   let tag = document.createElement('script');
@@ -555,7 +575,32 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   };
 
-  // ───────────────── VIDEO HELPERS ─────────────────
+  // ───────────────── SYNC LISTENER ─────────────────
+  roomRef.on("value", (snap) => {
+    const data = snap.val();
+    if (!data || !player) return;
+
+    // video sync
+    if (data.videoId) {
+      const current = player.getVideoData().video_id;
+
+      if (current !== data.videoId) {
+        player.loadVideoById(data.videoId);
+      }
+
+      document.getElementById("overlay").classList.add("hidden");
+      document.getElementById("exitBtn").classList.add("visible");
+    }
+
+    // play/pause sync
+    if (data.playing) {
+      player.playVideo();
+    } else {
+      player.pauseVideo();
+    }
+  });
+
+  // ───────────────── VIDEO INPUT ─────────────────
   function extractVideoId(url) {
     let match = url.match(/[?&]v=([^&]+)/);
     if (match) return match[1];
@@ -572,17 +617,21 @@ window.addEventListener("DOMContentLoaded", () => {
     const input = document.getElementById("videoInput").value.trim();
     const id = extractVideoId(input);
 
-    if (!player) return alert("Player not ready yet.");
+    if (!id) return;
 
-    if (id) {
-      player.loadVideoById(id);
-
-      document.getElementById('overlay').classList.add('hidden');
-      document.getElementById('exitBtn').classList.add('visible');
-    }
+    roomRef.update({
+      videoId: id,
+      playing: true,
+      updatedAt: Date.now()
+    });
   };
 
   window.exitVideo = function () {
+    roomRef.update({
+      playing: false,
+      videoId: null
+    });
+
     if (player) player.stopVideo();
 
     document.getElementById('overlay').classList.remove('hidden');
@@ -598,7 +647,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("reactionMenu").classList.remove("open");
 
-    // popup text
     const popup = document.createElement("div");
     popup.className = "reaction-popup";
     popup.textContent = reaction;
@@ -606,24 +654,20 @@ window.addEventListener("DOMContentLoaded", () => {
 
     setTimeout(() => popup.remove(), 2000);
 
-    // sound system
     let sound;
 
-    if (reaction === "Clap") {
-      sound = document.getElementById("clapSound");
-    } else if (reaction === "Cheer") {
-      sound = document.getElementById("cheerSound");
-    } else if (reaction === "Boo") {
-      sound = document.getElementById("booSound");
-    }
+    if (reaction === "Clap") sound = document.getElementById("clapSound");
+    if (reaction === "Cheer") sound = document.getElementById("cheerSound");
+    if (reaction === "Boo") sound = document.getElementById("booSound");
 
     if (sound) {
       sound.currentTime = 0;
       sound.play().catch(() => {});
     }
+
+    // OPTIONAL: sync reactions to room (ADD THIS NEXT STEP LATER)
   };
 
-  // close reaction menu when clicking outside
   document.addEventListener("click", (e) => {
     const menu = document.getElementById("reactionMenu");
     const container = document.querySelector(".reactions-container");
