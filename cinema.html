@@ -547,14 +547,35 @@ window.addEventListener("DOMContentLoaded", () => {
   // ───────────────── ROOM ─────────────────
   const roomCode = new URLSearchParams(window.location.search).get("room");
   const display = document.getElementById("roomDisplay");
+  const roomRef = db.ref("rooms/" + roomCode);
+
+  const clientId = crypto.randomUUID();
+  let isHost = false;
 
   if (display) {
     display.textContent = roomCode ? `ROOM: ${roomCode}` : "NO ROOM";
   }
 
-  const roomRef = db.ref("rooms/" + roomCode);
+  // ───────────────── HOST DETECTION ─────────────────
+  roomRef.once("value").then((snap) => {
+    const data = snap.val();
 
-  console.log("Room code:", roomCode);
+    if (!data || !data.host) {
+      // first person becomes host
+      roomRef.set({
+        host: clientId,
+        videoId: null,
+        playing: false,
+        currentTime: 0,
+        lastUpdate: Date.now()
+      });
+      isHost = true;
+      console.log("You are HOST");
+    } else {
+      isHost = data.host === clientId;
+      console.log("Host status:", isHost);
+    }
+  });
 
   // ───────────────── YOUTUBE ─────────────────
   let player;
@@ -580,7 +601,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const now = Date.now();
     const elapsed = (now - (data.lastUpdate || now)) / 1000;
 
-    // ── VIDEO LOAD SYNC ──
+    // ── VIDEO LOAD ──
     if (data.videoId) {
       const current = player.getVideoData().video_id;
 
@@ -592,7 +613,7 @@ window.addEventListener("DOMContentLoaded", () => {
       document.getElementById("exitBtn").classList.add("visible");
     }
 
-    // ── TIMING / PLAYBACK SYNC ──
+    // ── TIMELINE SYNC ──
     if (typeof data.currentTime === "number") {
 
       const targetTime = data.playing
@@ -609,6 +630,48 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // ───────────────── DRIFT CORRECTION LOOP ─────────────────
+  setInterval(() => {
+    if (!player) return;
+
+    roomRef.once("value").then((snap) => {
+      const data = snap.val();
+      if (!data) return;
+
+      const now = Date.now();
+      const elapsed = (now - (data.lastUpdate || now)) / 1000;
+
+      const expected = data.playing
+        ? data.currentTime + elapsed
+        : data.currentTime;
+
+      const actual = player.getCurrentTime();
+      const drift = Math.abs(expected - actual);
+
+      if (drift > 1.5) {
+        player.seekTo(expected, true);
+      }
+
+      if (data.playing && player.getPlayerState() !== 1) {
+        player.playVideo();
+      }
+
+      if (!data.playing && player.getPlayerState() === 1) {
+        player.pauseVideo();
+      }
+    });
+  }, 2000);
+
+  // ───────────────── HOST HEARTBEAT ─────────────────
+  setInterval(() => {
+    if (!player || !isHost) return;
+
+    roomRef.update({
+      currentTime: player.getCurrentTime(),
+      lastUpdate: Date.now()
+    });
+  }, 3000);
+
   // ───────────────── VIDEO INPUT ─────────────────
   function extractVideoId(url) {
     let match = url.match(/[?&]v=([^&]+)/);
@@ -623,12 +686,15 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   window.loadVideo = function () {
+    if (!isHost) return; // ONLY HOST CAN CONTROL
+
     const input = document.getElementById("videoInput").value.trim();
     const id = extractVideoId(input);
 
     if (!id) return;
 
     roomRef.set({
+      host: clientId,
       videoId: id,
       playing: true,
       currentTime: 0,
@@ -637,6 +703,8 @@ window.addEventListener("DOMContentLoaded", () => {
   };
 
   window.exitVideo = function () {
+    if (!isHost) return;
+
     roomRef.update({
       playing: false,
       videoId: null,
