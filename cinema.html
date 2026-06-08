@@ -558,16 +558,16 @@ window.addEventListener("DOMContentLoaded", () => {
   const myId = crypto.randomUUID();
   let isHost = false;
 
-  // ── TRY TO BECOME HOST ──
+  // ───────────────── HOST CLAIM ─────────────────
   hostRef.transaction(current => {
     if (current === null) return myId;
     return current;
   }, (error, committed, snapshot) => {
     if (snapshot.val() === myId) {
       isHost = true;
-      console.log("I am host");
+      console.log("HOST MODE ENABLED");
     } else {
-      console.log("I am viewer");
+      console.log("VIEWER MODE");
     }
   });
 
@@ -583,7 +583,11 @@ window.addEventListener("DOMContentLoaded", () => {
       width: '100%',
       height: '100%',
       videoId: '',
-      playerVars: { rel: 0, controls: 1 }
+      playerVars: {
+        rel: 0,
+        controls: isHost ? 1 : 0,   // host only controls
+        disablekb: !isHost
+      }
     });
   };
 
@@ -595,7 +599,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const now = Date.now();
     const elapsed = (now - (data.lastUpdate || now)) / 1000;
 
-    // LOAD VIDEO
+    // ── LOAD VIDEO ──
     if (data.videoId) {
       const current = player.getVideoData().video_id;
 
@@ -607,7 +611,7 @@ window.addEventListener("DOMContentLoaded", () => {
       document.getElementById("exitBtn").classList.add("visible");
     }
 
-    // ONLY NON-HOSTS SYNC PLAYBACK
+    // ── VIEWER SYNC ONLY ──
     if (!isHost && typeof data.currentTime === "number") {
 
       const targetTime = data.playing
@@ -616,19 +620,24 @@ window.addEventListener("DOMContentLoaded", () => {
 
       const localTime = player.getCurrentTime?.() || 0;
 
-      if (Math.abs(localTime - targetTime) > 1.5) {
+      const drift = Math.abs(localTime - targetTime);
+
+      // only correct if badly desynced
+      if (drift > 2.5) {
         player.seekTo(targetTime, true);
       }
 
-      if (data.playing) {
+      if (data.playing && player.getPlayerState() !== YT.PlayerState.PLAYING) {
         player.playVideo();
-      } else {
+      }
+
+      if (!data.playing && player.getPlayerState() !== YT.PlayerState.PAUSED) {
         player.pauseVideo();
       }
     }
   });
 
-  // ───────────────── HOST UPDATES ─────────────────
+  // ───────────────── HOST STATE PUSH ─────────────────
   function pushState() {
     if (!player || !isHost) return;
 
@@ -639,7 +648,7 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  setInterval(pushState, 1000);
+  setInterval(pushState, 1200);
 
   // ───────────────── VIDEO INPUT ─────────────────
   function extractVideoId(url) {
