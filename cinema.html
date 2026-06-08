@@ -5,11 +5,7 @@
 <title>CinemaClub</title>
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   height: 100vh;
@@ -18,35 +14,25 @@ body {
   background: radial-gradient(circle at 50% 20%, #151515 0%, #050505 60%, #000 100%);
 }
 
-/* ───────────────── SCREEN ───────────────── */
 .screen-section {
   position: relative;
   height: 58%;
   margin: 12px 12px 0 12px;
   border-radius: 14px;
   overflow: hidden;
-
   background: #000;
   border: 1px solid rgba(255,255,255,0.08);
-
   transform: perspective(1200px) rotateX(-6deg);
   transform-origin: top center;
-
   box-shadow:
     0 80px 180px rgba(0,0,0,0.95),
     inset 0 0 80px rgba(255,255,255,0.05),
     0 0 25px rgba(120, 80, 255, 0.35),
     0 0 60px rgba(80, 180, 255, 0.25);
-
   outline: 1px solid rgba(120, 80, 255, 0.25);
 }
 
-#player {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  z-index: 1;
-}
+#player { width: 100%; height: 100%; position: relative; z-index: 1; }
 
 .screen-section::before {
   content: '';
@@ -54,15 +40,9 @@ body {
   inset: 0;
   pointer-events: none;
   z-index: 2;
-
-  background:
-    linear-gradient(to bottom,
-      rgba(255,255,255,0.06),
-      transparent 40%,
-      rgba(0,0,0,0.5));
+  background: linear-gradient(to bottom, rgba(255,255,255,0.06), transparent 40%, rgba(0,0,0,0.5));
 }
 
-/* ───────────────── OVERLAY ───────────────── */
 .screen-overlay {
   position: absolute;
   inset: 0;
@@ -71,285 +51,120 @@ body {
   justify-content: center;
   align-items: center;
   gap: 14px;
-
   background: rgba(0,0,0,0.9);
   z-index: 5;
-
   transition: opacity 0.4s ease, transform 0.4s ease;
 }
+.screen-overlay.hidden { opacity: 0; pointer-events: none; transform: scale(1.05); }
+.screen-overlay h2 { letter-spacing: 10px; color: rgba(255,255,255,0.55); font-weight: 300; }
 
-.screen-overlay.hidden {
-  opacity: 0;
-  pointer-events: none;
-  transform: scale(1.05);
-}
-
-.screen-overlay h2 {
-  letter-spacing: 10px;
-  color: rgba(255,255,255,0.55);
-  font-weight: 300;
-}
-
-.overlay-controls {
-  display: flex;
-  gap: 10px;
-}
-
+.overlay-controls { display: flex; gap: 10px; }
 .overlay-controls input {
-  width: 320px;
-  padding: 10px;
-  background: #111;
-  border: 1px solid #333;
-  color: white;
+  width: 320px; padding: 10px;
+  background: #111; border: 1px solid #333; color: white;
 }
-
 .overlay-controls button {
-  background: #ff3b3b;
-  border: none;
-  padding: 10px 18px;
-  color: white;
-  cursor: pointer;
+  background: #ff3b3b; border: none; padding: 10px 18px; color: white; cursor: pointer;
 }
-
-/* Viewer message shown instead of input when not host */
-.viewer-waiting {
-  color: rgba(255,255,255,0.4);
-  font-size: 13px;
-  letter-spacing: 3px;
-}
+.viewer-waiting { color: rgba(255,255,255,0.4); font-size: 13px; letter-spacing: 3px; }
 
 .exit-btn {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  z-index: 10;
-
-  opacity: 0;
-  pointer-events: none;
-
+  position: absolute; top: 12px; right: 12px; z-index: 10;
+  opacity: 0; pointer-events: none;
   padding: 6px 10px;
-  background: rgba(0,0,0,0.6);
-  border: 1px solid rgba(255,255,255,0.15);
-  color: white;
-  cursor: pointer;
+  background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15); color: white; cursor: pointer;
 }
+.exit-btn.visible { opacity: 1; pointer-events: all; }
 
-.exit-btn.visible {
-  opacity: 1;
-  pointer-events: all;
-}
-
-/* ───────────────── AUDIENCE ───────────────── */
 .audience-section {
   height: 42%;
   margin: 0 12px 12px;
   position: relative;
   overflow: hidden;
-
   background: linear-gradient(to bottom, #0a0a0a, #000);
-
   border-radius: 0 0 12px 12px;
-
   transform: perspective(1200px) rotateX(8deg);
   transform-origin: top center;
 }
 
 .rows-container {
-  position: absolute;
-  bottom: 0;
-  left: 120px;
-  right: 120px;
-
-  display: flex;
-  flex-direction: column-reverse;
-  align-items: stretch;
-
-  perspective: 900px;
-  padding: 10px 0;
+  position: absolute; bottom: 0; left: 120px; right: 120px;
+  display: flex; flex-direction: column-reverse; align-items: stretch;
+  perspective: 900px; padding: 10px 0;
 }
 
-.row {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  width: 100%;
-  margin-bottom: 6px;
-}
-
+.row { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; margin-bottom: 6px; }
 .row-0 { transform: translateX(0px) translateZ(0px) scale(1); opacity: 1; }
 .row-1 { transform: translateZ(-40px) scale(0.92); opacity: 0.9; }
 .row-2 { transform: translateZ(-90px) scale(0.82); opacity: 0.72; }
 .row-3 { transform: translateZ(-150px) scale(0.70); opacity: 0.52; }
 .row-4 { transform: translateZ(-220px) scale(0.60); opacity: 0.38; }
 
-.person {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  filter: drop-shadow(0 6px 6px rgba(0,0,0,0.7));
-}
+.person { display: flex; flex-direction: column; align-items: center; filter: drop-shadow(0 6px 6px rgba(0,0,0,0.7)); }
+.head { border-radius: 50%; border: 2px solid rgba(255,255,255,0.9); background: radial-gradient(circle at 30% 30%, #222, #000); }
+.body { border: 2px solid rgba(255,255,255,0.85); border-radius: 6px; background: linear-gradient(to bottom, #111, #000); }
+.chair-seat { background: linear-gradient(to bottom, #222, #111); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
 
-.head {
-  border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.9);
-  background: radial-gradient(circle at 30% 30%, #222, #000);
-}
+.row-0 .head { width: 44px; height: 44px; } .row-0 .body { width: 72px; height: 62px; } .row-0 .chair-seat { width: 88px; height: 10px; }
+.row-1 .head { width: 38px; height: 38px; } .row-1 .body { width: 62px; height: 54px; } .row-1 .chair-seat { width: 76px; height: 9px; }
+.row-2 .head { width: 32px; height: 32px; } .row-2 .body { width: 52px; height: 46px; } .row-2 .chair-seat { width: 64px; height: 8px; }
+.row-3 .head { width: 26px; height: 26px; } .row-3 .body { width: 42px; height: 38px; } .row-3 .chair-seat { width: 52px; height: 7px; }
+.row-4 .head { width: 20px; height: 20px; } .row-4 .body { width: 34px; height: 30px; } .row-4 .chair-seat { width: 42px; height: 6px; }
 
-.body {
-  border: 2px solid rgba(255,255,255,0.85);
-  border-radius: 6px;
-  background: linear-gradient(to bottom, #111, #000);
-}
-
-.chair-seat {
-  background: linear-gradient(to bottom, #222, #111);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-}
-
-.row-0 .head { width: 44px; height: 44px; }
-.row-0 .body { width: 72px; height: 62px; }
-.row-0 .chair-seat { width: 88px; height: 10px; }
-
-.row-1 .head { width: 38px; height: 38px; }
-.row-1 .body { width: 62px; height: 54px; }
-.row-1 .chair-seat { width: 76px; height: 9px; }
-
-.row-2 .head { width: 32px; height: 32px; }
-.row-2 .body { width: 52px; height: 46px; }
-.row-2 .chair-seat { width: 64px; height: 8px; }
-
-.row-3 .head { width: 26px; height: 26px; }
-.row-3 .body { width: 42px; height: 38px; }
-.row-3 .chair-seat { width: 52px; height: 7px; }
-
-.row-4 .head { width: 20px; height: 20px; }
-.row-4 .body { width: 34px; height: 30px; }
-.row-4 .chair-seat { width: 42px; height: 6px; }
-
-/* ───────────────── REACTIONS ───────────────── */
-.reactions-container {
-  position: absolute;
-  bottom: 35px;
-  left: 35px;
-  transform: translateX(8px);
-  z-index: 20;
-}
-
+.reactions-container { position: absolute; bottom: 35px; left: 35px; transform: translateX(8px); z-index: 20; }
 .reaction-toggle {
-  width: 70px;
-  height: 70px;
-
-  border: 3px solid rgba(255,255,255,0.15);
-  border-radius: 14px;
-
-  background: rgba(15,15,15,0.9);
-  color: white;
-  font-size: 28px;
-
-  cursor: pointer;
-
-  box-shadow:
-    0 10px 25px rgba(0,0,0,0.5),
-    inset 0 0 20px rgba(255,255,255,0.03);
-
+  width: 70px; height: 70px;
+  border: 3px solid rgba(255,255,255,0.15); border-radius: 14px;
+  background: rgba(15,15,15,0.9); color: white; font-size: 28px; cursor: pointer;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,255,255,0.03);
   transition: all 0.2s ease;
 }
-
-.reaction-toggle:hover {
-  transform: translateY(-2px);
-  background: rgba(25,25,25,0.95);
-}
+.reaction-toggle:hover { transform: translateY(-2px); background: rgba(25,25,25,0.95); }
 
 .reaction-menu {
-  position: absolute;
-  bottom: 80px;
-  left: 0;
-
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(10px);
-
+  position: absolute; bottom: 80px; left: 0;
+  display: flex; flex-direction: column; gap: 8px;
+  opacity: 0; pointer-events: none; transform: translateY(10px);
   transition: all 0.25s ease;
 }
-
-.reaction-menu.open {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
-}
+.reaction-menu.open { opacity: 1; pointer-events: auto; transform: translateY(0); }
 
 .reaction-btn {
-  width: 100px;
-  padding: 12px;
-
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 12px;
-
-  background: rgba(20,20,20,0.95);
-  color: white;
-
-  cursor: pointer;
-
-  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-  transition: all 0.2s ease;
+  width: 100px; padding: 12px;
+  border: 1px solid rgba(255,255,255,0.12); border-radius: 12px;
+  background: rgba(20,20,20,0.95); color: white; cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4); transition: all 0.2s ease;
 }
-
-.reaction-btn:hover {
-  transform: translateX(4px);
-  background: rgba(35,35,35,0.95);
-}
+.reaction-btn:hover { transform: translateX(4px); background: rgba(35,35,35,0.95); }
 
 .reaction-popup {
-  position: fixed;
-  bottom: 180px;
-  left: 120px;
-
-  font-size: 40px;
-  color: white;
-
-  pointer-events: none;
+  position: fixed; bottom: 180px; left: 120px;
+  font-size: 40px; color: white; pointer-events: none;
   animation: floatUp 2s forwards;
 }
-
 @keyframes floatUp {
   0%   { opacity: 0; transform: translateY(20px) scale(0.8); }
   20%  { opacity: 1; }
   100% { opacity: 0; transform: translateY(-100px) scale(1.3); }
 }
 
-#roomDisplay {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  color: rgba(255,255,255,0.6);
-  font-size: 14px;
-  z-index: 50;
-}
+#roomDisplay { position: absolute; top: 20px; left: 20px; color: rgba(255,255,255,0.6); font-size: 14px; z-index: 50; }
 </style>
 </head>
-
 <body>
 
 <div id="roomDisplay"></div>
 
 <div class="screen-section">
   <button class="exit-btn" id="exitBtn" onclick="exitVideo()">✕ EXIT</button>
-
   <div class="screen-overlay" id="overlay">
     <h2>Virtual Cinema</h2>
-    <!-- Shown after host claim resolves -->
     <div id="overlayControls"></div>
   </div>
-
   <div id="player"></div>
 </div>
 
 <div class="audience-section">
-
   <div class="reactions-container">
     <div class="reaction-menu" id="reactionMenu">
       <button class="reaction-btn" onclick="sendReaction('Clap')">Clap</button>
@@ -360,7 +175,6 @@ body {
   </div>
 
   <div class="rows-container">
-
     <div class="row row-0">
       <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
       <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
@@ -382,7 +196,6 @@ body {
       <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
       <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
     </div>
-
     <div class="row row-1">
       <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
       <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
@@ -407,7 +220,6 @@ body {
       <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
       <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
     </div>
-
     <div class="row row-2">
       <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
       <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
@@ -433,7 +245,6 @@ body {
       <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
       <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
     </div>
-
     <div class="row row-3">
       <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
       <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
@@ -464,11 +275,9 @@ body {
       <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
       <div class="person"><div class="head"></div><div class="body"></div><div class="chair-seat"></div></div>
     </div>
-
   </div>
 </div>
 
-<!-- ───────────── REACTION SOUNDS ───────────── -->
 <audio id="clapSound" src="clap.mp3" preload="auto"></audio>
 <audio id="cheerSound" src="cheer.mp3" preload="auto"></audio>
 <audio id="booSound" src="boo.mp3" preload="auto"></audio>
@@ -492,12 +301,8 @@ const db = firebase.database();
 
 window.addEventListener("DOMContentLoaded", () => {
 
-  // ───────────────── ROOM ─────────────────
   const roomCode = new URLSearchParams(window.location.search).get("room");
-  const display = document.getElementById("roomDisplay");
-  if (display) {
-    display.textContent = roomCode ? `ROOM: ${roomCode}` : "NO ROOM";
-  }
+  document.getElementById("roomDisplay").textContent = roomCode ? `ROOM: ${roomCode}` : "NO ROOM";
 
   const roomRef = db.ref("rooms/" + roomCode);
   const hostRef = db.ref("rooms/" + roomCode + "/host");
@@ -507,48 +312,42 @@ window.addEventListener("DOMContentLoaded", () => {
   let player = null;
   let playerReady = false;
 
-  // ───────────────────────────────────────────────────
-  // FIX 1: Resolve host claim FIRST, then build player.
-  //         This ensures controls/disablekb are set correctly
-  //         because playerVars are baked in at init time.
-  // ───────────────────────────────────────────────────
+  // The key state for viewer: tracks what video is currently loaded
+  // in the player so we don't re-loadVideoById unnecessarily.
+  let loadedVideoId = null;
+
+  // Pending sync data: if Firebase fires before player is ready,
+  // we store it and apply it once onPlayerReady fires.
+  let pendingSync = null;
+
+  // ── Step 1: Claim host, THEN build player with correct controls ──
   hostRef.transaction(current => {
     if (current === null) return myId;
     return current;
   }, (error, committed, snapshot) => {
     if (!snapshot) return;
     isHost = snapshot.val() === myId;
-    console.log(isHost ? "HOST MODE" : "VIEWER MODE");
+    console.log(isHost ? "HOST" : "VIEWER");
 
-    // Render the correct overlay UI now that we know role
-    renderOverlayUI();
-
-    // NOW load the YouTube API — player won't be created until
-    // onYouTubeIframeAPIReady fires, which is after this callback.
-    loadYouTubeAPI();
-  });
-
-  // ───────────────── OVERLAY UI ─────────────────
-  function renderOverlayUI() {
-    const container = document.getElementById("overlayControls");
+    // Show correct overlay UI
+    const ctrl = document.getElementById("overlayControls");
     if (isHost) {
-      container.innerHTML = `
+      ctrl.innerHTML = `
         <div class="overlay-controls">
           <input id="videoInput" placeholder="Paste YouTube link or video ID…" />
           <button onclick="loadVideo()">▶ Play</button>
         </div>`;
     } else {
-      container.innerHTML = `<p class="viewer-waiting">WAITING FOR HOST…</p>`;
+      ctrl.innerHTML = `<p class="viewer-waiting">WAITING FOR HOST…</p>`;
     }
-  }
 
-  // ───────────────── YOUTUBE API LOAD ─────────────────
-  function loadYouTubeAPI() {
+    // Step 2: Load YouTube IFrame API now that we know our role
     const tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
     document.body.appendChild(tag);
-  }
+  });
 
+  // ── Step 3: Build player with correct controls ──
   window.onYouTubeIframeAPIReady = function () {
     player = new YT.Player('player', {
       width: '100%',
@@ -558,8 +357,8 @@ window.addEventListener("DOMContentLoaded", () => {
         rel: 0,
         controls: isHost ? 1 : 0,
         disablekb: isHost ? 0 : 1,
-        autoplay: 0,
-        modestbranding: 1
+        modestbranding: 1,
+        // autoplay:1 causes issues on load with no video — leave off
       },
       events: {
         onReady: onPlayerReady,
@@ -570,78 +369,122 @@ window.addEventListener("DOMContentLoaded", () => {
 
   function onPlayerReady() {
     playerReady = true;
-    console.log("YouTube player ready");
-  }
-
-  // Host: push state immediately on play/pause so viewers react fast
-  function onPlayerStateChange(event) {
-    if (isHost) {
-      const s = event.data;
-      if (s === YT.PlayerState.PLAYING || s === YT.PlayerState.PAUSED) {
-        pushState();
-      }
+    // If Firebase already sent us sync data before player was ready, apply it now
+    if (pendingSync) {
+      applySync(pendingSync);
+      pendingSync = null;
     }
   }
 
-  // ───────────────── SYNC LISTENER ─────────────────
+  // Host pushes state on play/pause events for instant viewer response
+  function onPlayerStateChange(event) {
+    if (!isHost) return;
+    const s = event.data;
+    if (s === YT.PlayerState.PLAYING || s === YT.PlayerState.PAUSED) {
+      pushState();
+    }
+  }
+
+  // ── Firebase listener ──
   roomRef.on("value", (snap) => {
     const data = snap.val();
-    if (!data || !player || !playerReady) return;
+    if (!data) return;
 
-    // ── LOAD VIDEO ──
+    if (!playerReady) {
+      // Player not ready yet — store and apply once it is
+      pendingSync = data;
+      return;
+    }
+
+    applySync(data);
+  });
+
+  // ── Core sync logic — only called when player is confirmed ready ──
+  function applySync(data) {
+    // Show/hide overlay
     if (data.videoId) {
-      let currentId = "";
-      try { currentId = player.getVideoData().video_id; } catch (e) {}
-
-      if (currentId !== data.videoId) {
-        player.loadVideoById(data.videoId);
-      }
-
       document.getElementById("overlay").classList.add("hidden");
       document.getElementById("exitBtn").classList.add("visible");
     } else {
-      // videoId cleared (host exited)
       document.getElementById("overlay").classList.remove("hidden");
       document.getElementById("exitBtn").classList.remove("visible");
+      loadedVideoId = null;
+      return;
     }
 
-    // ── VIEWER SYNC ONLY ──
-    // FIX 2: Don't sync while buffering — let the buffer settle first.
-    //         Don't seek if player isn't ready or video isn't loaded.
-    //         Raise drift threshold slightly to avoid seek-buffer loops.
-    if (!isHost && typeof data.currentTime === "number") {
-      const state = player.getPlayerState?.();
+    // ── Load the video if it changed ──
+    // We use cueVideoById for viewers (loads but does NOT autoplay yet)
+    // and loadVideoById for host (loads and plays immediately).
+    // This prevents the viewer from starting before we've synced the timestamp.
+    if (data.videoId !== loadedVideoId) {
+      loadedVideoId = data.videoId;
 
-      // Skip sync entirely while buffering — seeking during buffer = more buffer
-      if (state === YT.PlayerState.BUFFERING) return;
-
-      const now = Date.now();
-      const elapsed = (now - (data.lastUpdate || now)) / 1000;
-      const targetTime = data.playing ? data.currentTime + elapsed : data.currentTime;
-      const localTime = player.getCurrentTime?.() || 0;
-      const drift = Math.abs(localTime - targetTime);
-
-      // Only seek if meaningfully desynced (3s threshold reduces seek-buffer loops)
-      if (drift > 3) {
-        player.seekTo(targetTime, true);
+      if (isHost) {
+        // Host: just load it — YouTube controls handle play/pause
+        const currentId = (() => { try { return player.getVideoData().video_id; } catch(e) { return ""; } })();
+        if (currentId !== data.videoId) {
+          player.loadVideoById(data.videoId);
+        }
+      } else {
+        // Viewer: CUE (don't autoplay) so we can seek first, then play
+        // This is the key fix — cueVideoById fires onStateChange CUED (5)
+        // which we handle below to then seek + play at the right time.
+        const now = Date.now();
+        const elapsed = (now - (data.lastUpdate || now)) / 1000;
+        const targetTime = data.playing ? data.currentTime + elapsed : data.currentTime;
+        player.cueVideoById({ videoId: data.videoId, startSeconds: targetTime });
+        // cueVideoById with startSeconds seeks before buffering starts,
+        // then we call playVideo once it's cued (state 5)
       }
+      return; // Don't apply play/pause logic this tick — wait for cue/load
+    }
 
-      if (data.playing && state !== YT.PlayerState.PLAYING) {
+    // ── Viewer ongoing sync (video already loaded) ──
+    if (!isHost) {
+      viewerSync(data);
+    }
+  }
+
+  function viewerSync(data) {
+    const state = player.getPlayerState?.();
+
+    // State 5 = CUED: video is ready at our startSeconds, safe to play now
+    if (state === YT.PlayerState.CUED) {
+      if (data.playing) {
         player.playVideo();
-      } else if (!data.playing && state !== YT.PlayerState.PAUSED) {
-        player.pauseVideo();
       }
+      return;
     }
-  });
 
-  // ───────────────── HOST STATE PUSH ─────────────────
-  // FIX 3: Guard against pushing bad state when player isn't ready
-  //         or is in unstarted (-1) / ended (0) state.
+    // Don't interfere while buffering — let YouTube handle it
+    if (state === YT.PlayerState.BUFFERING) return;
+
+    // Don't interfere while unstarted
+    if (state === YT.PlayerState.UNSTARTED) return;
+
+    // Drift correction
+    const now = Date.now();
+    const elapsed = (now - (data.lastUpdate || now)) / 1000;
+    const targetTime = data.playing ? data.currentTime + elapsed : data.currentTime;
+    const localTime = player.getCurrentTime?.() || 0;
+    const drift = Math.abs(localTime - targetTime);
+
+    if (drift > 4) {
+      player.seekTo(targetTime, true);
+    }
+
+    // Play/pause state
+    if (data.playing && state !== YT.PlayerState.PLAYING) {
+      player.playVideo();
+    } else if (!data.playing && state !== YT.PlayerState.PAUSED) {
+      player.pauseVideo();
+    }
+  }
+
+  // ── Host pushes current state to Firebase ──
   function pushState() {
     if (!player || !isHost || !playerReady) return;
-
     const state = player.getPlayerState?.();
-    // Don't push garbage timestamps when video hasn't started
     if (state === -1 || state === YT.PlayerState.ENDED) return;
 
     roomRef.update({
@@ -651,29 +494,25 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Periodic sync — keeps viewers aligned during long playback
-  setInterval(pushState, 1500);
+  // Periodic heartbeat so viewers stay in sync during long playback
+  setInterval(pushState, 2000);
 
-  // ───────────────── VIDEO INPUT ─────────────────
+  // ── Video input ──
   function extractVideoId(url) {
-    let match = url.match(/[?&]v=([^&]+)/);
-    if (match) return match[1];
-
-    match = url.match(/youtu\.be\/([^?&]+)/);
-    if (match) return match[1];
-
+    let m = url.match(/[?&]v=([^&]+)/);
+    if (m) return m[1];
+    m = url.match(/youtu\.be\/([^?&]+)/);
+    if (m) return m[1];
     if (/^[a-zA-Z0-9_-]{11}$/.test(url)) return url;
     return null;
   }
 
   window.loadVideo = function () {
     if (!isHost) return alert("Only the host can load a video.");
-
     const input = document.getElementById("videoInput").value.trim();
     const id = extractVideoId(input);
     if (!id) return alert("Couldn't find a valid YouTube video ID.");
 
-    // Use update instead of set so we don't accidentally wipe the host field
     roomRef.update({
       videoId: id,
       playing: true,
@@ -684,43 +523,28 @@ window.addEventListener("DOMContentLoaded", () => {
 
   window.exitVideo = function () {
     if (!isHost) return;
-
-    roomRef.update({
-      playing: false,
-      videoId: null,
-      currentTime: 0,
-      lastUpdate: Date.now()
-    });
-
+    roomRef.update({ playing: false, videoId: null, currentTime: 0, lastUpdate: Date.now() });
     if (player) player.stopVideo();
-
     document.getElementById('overlay').classList.remove('hidden');
     document.getElementById('exitBtn').classList.remove('visible');
   };
 
-  // ───────────────── REACTIONS ─────────────────
+  // ── Reactions ──
   window.toggleReactions = function () {
     document.getElementById("reactionMenu").classList.toggle("open");
   };
 
   window.sendReaction = function (reaction) {
     document.getElementById("reactionMenu").classList.remove("open");
-
     const popup = document.createElement("div");
     popup.className = "reaction-popup";
     popup.textContent = reaction;
     document.body.appendChild(popup);
     setTimeout(() => popup.remove(), 2000);
 
-    let sound;
-    if (reaction === "Clap")  sound = document.getElementById("clapSound");
-    if (reaction === "Cheer") sound = document.getElementById("cheerSound");
-    if (reaction === "Boo")   sound = document.getElementById("booSound");
-
-    if (sound) {
-      sound.currentTime = 0;
-      sound.play().catch(() => {});
-    }
+    const sounds = { Clap: "clapSound", Cheer: "cheerSound", Boo: "booSound" };
+    const sound = document.getElementById(sounds[reaction]);
+    if (sound) { sound.currentTime = 0; sound.play().catch(() => {}); }
   };
 
 });
