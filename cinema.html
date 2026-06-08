@@ -541,9 +541,6 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-</script>
-  
-<script>
 
 window.addEventListener("DOMContentLoaded", () => {
 
@@ -562,7 +559,7 @@ window.addEventListener("DOMContentLoaded", () => {
   // ───────────────── YOUTUBE ─────────────────
   let player;
 
-  let tag = document.createElement('script');
+  const tag = document.createElement('script');
   tag.src = "https://www.youtube.com/iframe_api";
   document.body.appendChild(tag);
 
@@ -580,7 +577,10 @@ window.addEventListener("DOMContentLoaded", () => {
     const data = snap.val();
     if (!data || !player) return;
 
-    // video sync
+    const now = Date.now();
+    const elapsed = (now - (data.lastUpdate || now)) / 1000;
+
+    // ── VIDEO LOAD SYNC ──
     if (data.videoId) {
       const current = player.getVideoData().video_id;
 
@@ -592,11 +592,20 @@ window.addEventListener("DOMContentLoaded", () => {
       document.getElementById("exitBtn").classList.add("visible");
     }
 
-    // play/pause sync
-    if (data.playing) {
-      player.playVideo();
-    } else {
-      player.pauseVideo();
+    // ── TIMING / PLAYBACK SYNC ──
+    if (typeof data.currentTime === "number") {
+
+      const targetTime = data.playing
+        ? data.currentTime + elapsed
+        : data.currentTime;
+
+      player.seekTo(targetTime, true);
+
+      if (data.playing) {
+        player.playVideo();
+      } else {
+        player.pauseVideo();
+      }
     }
   });
 
@@ -619,17 +628,20 @@ window.addEventListener("DOMContentLoaded", () => {
 
     if (!id) return;
 
-    roomRef.update({
+    roomRef.set({
       videoId: id,
       playing: true,
-      updatedAt: Date.now()
+      currentTime: 0,
+      lastUpdate: Date.now()
     });
   };
 
   window.exitVideo = function () {
     roomRef.update({
       playing: false,
-      videoId: null
+      videoId: null,
+      currentTime: 0,
+      lastUpdate: Date.now()
     });
 
     if (player) player.stopVideo();
@@ -664,8 +676,6 @@ window.addEventListener("DOMContentLoaded", () => {
       sound.currentTime = 0;
       sound.play().catch(() => {});
     }
-
-    // OPTIONAL: sync reactions to room (ADD THIS NEXT STEP LATER)
   };
 
   document.addEventListener("click", (e) => {
@@ -678,7 +688,6 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 
 });
-
 </script>
 </body>
 </html>
