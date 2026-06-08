@@ -4,8 +4,6 @@
 <meta charset="UTF-8" />
 <title>CinemaClub</title>
 
-
-  
 <style>
 * {
   margin: 0;
@@ -34,11 +32,11 @@ body {
   transform: perspective(1200px) rotateX(-6deg);
   transform-origin: top center;
 
- box-shadow:
-  0 80px 180px rgba(0,0,0,0.95),
-  inset 0 0 80px rgba(255,255,255,0.05),
-  0 0 25px rgba(120, 80, 255, 0.35),
-  0 0 60px rgba(80, 180, 255, 0.25);
+  box-shadow:
+    0 80px 180px rgba(0,0,0,0.95),
+    inset 0 0 80px rgba(255,255,255,0.05),
+    0 0 25px rgba(120, 80, 255, 0.35),
+    0 0 60px rgba(80, 180, 255, 0.25);
 
   outline: 1px solid rgba(120, 80, 255, 0.25);
 }
@@ -50,7 +48,6 @@ body {
   z-index: 1;
 }
 
-/* SCREEN LIGHT PROJECTING DOWN INTO THE ROOM */
 .screen-section::before {
   content: '';
   position: absolute;
@@ -63,20 +60,6 @@ body {
       rgba(255,255,255,0.06),
       transparent 40%,
       rgba(0,0,0,0.5));
-}
-
-/* LIGHT BEAM SPILL INTO AUDIENCE */
-.screen-section::after {
-  content: '';
-  position: absolute;
-  bottom: -120px;
-  left: -20%;
-  width: 140%;
-  height: 160px;
-
-  background: transparent;
-
-  pointer-events: none;
 }
 
 /* ───────────────── OVERLAY ───────────────── */
@@ -128,6 +111,13 @@ body {
   cursor: pointer;
 }
 
+/* Viewer message shown instead of input when not host */
+.viewer-waiting {
+  color: rgba(255,255,255,0.4);
+  font-size: 13px;
+  letter-spacing: 3px;
+}
+
 .exit-btn {
   position: absolute;
   top: 12px;
@@ -141,6 +131,7 @@ body {
   background: rgba(0,0,0,0.6);
   border: 1px solid rgba(255,255,255,0.15);
   color: white;
+  cursor: pointer;
 }
 
 .exit-btn.visible {
@@ -155,8 +146,7 @@ body {
   position: relative;
   overflow: hidden;
 
-  background:
-    linear-gradient(to bottom, #0a0a0a, #000);
+  background: linear-gradient(to bottom, #0a0a0a, #000);
 
   border-radius: 0 0 12px 12px;
 
@@ -164,12 +154,9 @@ body {
   transform-origin: top center;
 }
 
-/* rows fill full width evenly */
 .rows-container {
   position: absolute;
   bottom: 0;
-
-  /* equal aisles */
   left: 120px;
   right: 120px;
 
@@ -181,24 +168,18 @@ body {
   padding: 10px 0;
 }
 
-/* each row spans full width like real theater */
 .row {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-
   width: 100%;
   margin-bottom: 6px;
 }
 
-/* depth layers */
-.row-0 {
-    transform: translateX(0px) translateZ(0px) scale(1);
-    opacity: 1;
-}
-.row-1 { transform: translateZ(-40px) scale(0.92); opacity: 0.9; } 
-.row-2 { transform: translateZ(-90px) scale(0.82); opacity: 0.72; } 
-.row-3 { transform: translateZ(-150px) scale(0.70); opacity: 0.52; } 
+.row-0 { transform: translateX(0px) translateZ(0px) scale(1); opacity: 1; }
+.row-1 { transform: translateZ(-40px) scale(0.92); opacity: 0.9; }
+.row-2 { transform: translateZ(-90px) scale(0.82); opacity: 0.72; }
+.row-3 { transform: translateZ(-150px) scale(0.70); opacity: 0.52; }
 .row-4 { transform: translateZ(-220px) scale(0.60); opacity: 0.38; }
 
 .person {
@@ -245,15 +226,12 @@ body {
 .row-4 .body { width: 34px; height: 30px; }
 .row-4 .chair-seat { width: 42px; height: 6px; }
 
-  /* ───────────────── REACTIONS ───────────────── */
+/* ───────────────── REACTIONS ───────────────── */
 .reactions-container {
-  
   position: absolute;
   bottom: 35px;
   left: 35px;
-
   transform: translateX(8px);
-
   z-index: 20;
 }
 
@@ -316,9 +294,7 @@ body {
 
   cursor: pointer;
 
-  box-shadow:
-    0 8px 20px rgba(0,0,0,0.4);
-
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
   transition: all 0.2s ease;
 }
 
@@ -340,22 +316,12 @@ body {
 }
 
 @keyframes floatUp {
-  0% {
-    opacity: 0;
-    transform: translateY(20px) scale(0.8);
-  }
-
-  20% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-    transform: translateY(-100px) scale(1.3);
-  }
+  0%   { opacity: 0; transform: translateY(20px) scale(0.8); }
+  20%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-100px) scale(1.3); }
 }
 
-  #roomDisplay {
+#roomDisplay {
   position: absolute;
   top: 20px;
   left: 20px;
@@ -363,25 +329,20 @@ body {
   font-size: 14px;
   z-index: 50;
 }
-
 </style>
 </head>
 
 <body>
 
-  <div id="roomDisplay"></div>
-
-  
+<div id="roomDisplay"></div>
 
 <div class="screen-section">
   <button class="exit-btn" id="exitBtn" onclick="exitVideo()">✕ EXIT</button>
 
   <div class="screen-overlay" id="overlay">
     <h2>Virtual Cinema</h2>
-    <div class="overlay-controls">
-      <input id="videoInput" placeholder="Paste YouTube link or video ID…" />
-      <button onclick="loadVideo()">▶ Play</button>
-    </div>
+    <!-- Shown after host claim resolves -->
+    <div id="overlayControls"></div>
   </div>
 
   <div id="player"></div>
@@ -389,28 +350,15 @@ body {
 
 <div class="audience-section">
 
-    <div class="reactions-container">
-
-  <div class="reaction-menu" id="reactionMenu">
-    <button class="reaction-btn" onclick="sendReaction('Clap')">
-      Clap
-    </button>
-
-    <button class="reaction-btn" onclick="sendReaction('Cheer')">
-      Cheer
-    </button>
-
-    <button class="reaction-btn" onclick="sendReaction('Boo')">
-      Boo
-    </button>
+  <div class="reactions-container">
+    <div class="reaction-menu" id="reactionMenu">
+      <button class="reaction-btn" onclick="sendReaction('Clap')">Clap</button>
+      <button class="reaction-btn" onclick="sendReaction('Cheer')">Cheer</button>
+      <button class="reaction-btn" onclick="sendReaction('Boo')">Boo</button>
+    </div>
+    <button class="reaction-toggle" onclick="toggleReactions()">React</button>
   </div>
 
-  <button class="reaction-toggle" onclick="toggleReactions()">
-    React
-  </button>
-
-</div>
-  
   <div class="rows-container">
 
     <div class="row row-0">
@@ -520,7 +468,7 @@ body {
   </div>
 </div>
 
-  <!-- ───────────── REACTION SOUNDS ───────────── -->
+<!-- ───────────── REACTION SOUNDS ───────────── -->
 <audio id="clapSound" src="clap.mp3" preload="auto"></audio>
 <audio id="cheerSound" src="cheer.mp3" preload="auto"></audio>
 <audio id="booSound" src="boo.mp3" preload="auto"></audio>
@@ -547,7 +495,6 @@ window.addEventListener("DOMContentLoaded", () => {
   // ───────────────── ROOM ─────────────────
   const roomCode = new URLSearchParams(window.location.search).get("room");
   const display = document.getElementById("roomDisplay");
-
   if (display) {
     display.textContent = roomCode ? `ROOM: ${roomCode}` : "NO ROOM";
   }
@@ -557,26 +504,50 @@ window.addEventListener("DOMContentLoaded", () => {
 
   const myId = crypto.randomUUID();
   let isHost = false;
+  let player = null;
+  let playerReady = false;
 
-  // ───────────────── HOST CLAIM ─────────────────
+  // ───────────────────────────────────────────────────
+  // FIX 1: Resolve host claim FIRST, then build player.
+  //         This ensures controls/disablekb are set correctly
+  //         because playerVars are baked in at init time.
+  // ───────────────────────────────────────────────────
   hostRef.transaction(current => {
     if (current === null) return myId;
     return current;
   }, (error, committed, snapshot) => {
-    if (snapshot.val() === myId) {
-      isHost = true;
-      console.log("HOST MODE ENABLED");
-    } else {
-      console.log("VIEWER MODE");
-    }
+    if (!snapshot) return;
+    isHost = snapshot.val() === myId;
+    console.log(isHost ? "HOST MODE" : "VIEWER MODE");
+
+    // Render the correct overlay UI now that we know role
+    renderOverlayUI();
+
+    // NOW load the YouTube API — player won't be created until
+    // onYouTubeIframeAPIReady fires, which is after this callback.
+    loadYouTubeAPI();
   });
 
-  // ───────────────── YOUTUBE ─────────────────
-  let player;
+  // ───────────────── OVERLAY UI ─────────────────
+  function renderOverlayUI() {
+    const container = document.getElementById("overlayControls");
+    if (isHost) {
+      container.innerHTML = `
+        <div class="overlay-controls">
+          <input id="videoInput" placeholder="Paste YouTube link or video ID…" />
+          <button onclick="loadVideo()">▶ Play</button>
+        </div>`;
+    } else {
+      container.innerHTML = `<p class="viewer-waiting">WAITING FOR HOST…</p>`;
+    }
+  }
 
-  const tag = document.createElement('script');
-  tag.src = "https://www.youtube.com/iframe_api";
-  document.body.appendChild(tag);
+  // ───────────────── YOUTUBE API LOAD ─────────────────
+  function loadYouTubeAPI() {
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.body.appendChild(tag);
+  }
 
   window.onYouTubeIframeAPIReady = function () {
     player = new YT.Player('player', {
@@ -585,70 +556,103 @@ window.addEventListener("DOMContentLoaded", () => {
       videoId: '',
       playerVars: {
         rel: 0,
-        controls: isHost ? 1 : 0,   // host only controls
-        disablekb: !isHost
+        controls: isHost ? 1 : 0,
+        disablekb: isHost ? 0 : 1,
+        autoplay: 0,
+        modestbranding: 1
+      },
+      events: {
+        onReady: onPlayerReady,
+        onStateChange: onPlayerStateChange
       }
     });
   };
 
+  function onPlayerReady() {
+    playerReady = true;
+    console.log("YouTube player ready");
+  }
+
+  // Host: push state immediately on play/pause so viewers react fast
+  function onPlayerStateChange(event) {
+    if (isHost) {
+      const s = event.data;
+      if (s === YT.PlayerState.PLAYING || s === YT.PlayerState.PAUSED) {
+        pushState();
+      }
+    }
+  }
+
   // ───────────────── SYNC LISTENER ─────────────────
   roomRef.on("value", (snap) => {
     const data = snap.val();
-    if (!data || !player) return;
-
-    const now = Date.now();
-    const elapsed = (now - (data.lastUpdate || now)) / 1000;
+    if (!data || !player || !playerReady) return;
 
     // ── LOAD VIDEO ──
     if (data.videoId) {
-      const current = player.getVideoData().video_id;
+      let currentId = "";
+      try { currentId = player.getVideoData().video_id; } catch (e) {}
 
-      if (current !== data.videoId) {
+      if (currentId !== data.videoId) {
         player.loadVideoById(data.videoId);
       }
 
       document.getElementById("overlay").classList.add("hidden");
       document.getElementById("exitBtn").classList.add("visible");
+    } else {
+      // videoId cleared (host exited)
+      document.getElementById("overlay").classList.remove("hidden");
+      document.getElementById("exitBtn").classList.remove("visible");
     }
 
     // ── VIEWER SYNC ONLY ──
+    // FIX 2: Don't sync while buffering — let the buffer settle first.
+    //         Don't seek if player isn't ready or video isn't loaded.
+    //         Raise drift threshold slightly to avoid seek-buffer loops.
     if (!isHost && typeof data.currentTime === "number") {
+      const state = player.getPlayerState?.();
 
-      const targetTime = data.playing
-        ? data.currentTime + elapsed
-        : data.currentTime;
+      // Skip sync entirely while buffering — seeking during buffer = more buffer
+      if (state === YT.PlayerState.BUFFERING) return;
 
+      const now = Date.now();
+      const elapsed = (now - (data.lastUpdate || now)) / 1000;
+      const targetTime = data.playing ? data.currentTime + elapsed : data.currentTime;
       const localTime = player.getCurrentTime?.() || 0;
-
       const drift = Math.abs(localTime - targetTime);
 
-      // only correct if badly desynced
-      if (drift > 2.5) {
+      // Only seek if meaningfully desynced (3s threshold reduces seek-buffer loops)
+      if (drift > 3) {
         player.seekTo(targetTime, true);
       }
 
-      if (data.playing && player.getPlayerState() !== YT.PlayerState.PLAYING) {
+      if (data.playing && state !== YT.PlayerState.PLAYING) {
         player.playVideo();
-      }
-
-      if (!data.playing && player.getPlayerState() !== YT.PlayerState.PAUSED) {
+      } else if (!data.playing && state !== YT.PlayerState.PAUSED) {
         player.pauseVideo();
       }
     }
   });
 
   // ───────────────── HOST STATE PUSH ─────────────────
+  // FIX 3: Guard against pushing bad state when player isn't ready
+  //         or is in unstarted (-1) / ended (0) state.
   function pushState() {
-    if (!player || !isHost) return;
+    if (!player || !isHost || !playerReady) return;
+
+    const state = player.getPlayerState?.();
+    // Don't push garbage timestamps when video hasn't started
+    if (state === -1 || state === YT.PlayerState.ENDED) return;
 
     roomRef.update({
       currentTime: player.getCurrentTime(),
-      playing: player.getPlayerState() === YT.PlayerState.PLAYING,
+      playing: state === YT.PlayerState.PLAYING,
       lastUpdate: Date.now()
     });
   }
 
-  setInterval(pushState, 1200);
+  // Periodic sync — keeps viewers aligned during long playback
+  setInterval(pushState, 1500);
 
   // ───────────────── VIDEO INPUT ─────────────────
   function extractVideoId(url) {
@@ -659,24 +663,22 @@ window.addEventListener("DOMContentLoaded", () => {
     if (match) return match[1];
 
     if (/^[a-zA-Z0-9_-]{11}$/.test(url)) return url;
-
     return null;
   }
 
   window.loadVideo = function () {
-    if (!isHost) return alert("Only host can load video");
+    if (!isHost) return alert("Only the host can load a video.");
 
     const input = document.getElementById("videoInput").value.trim();
     const id = extractVideoId(input);
+    if (!id) return alert("Couldn't find a valid YouTube video ID.");
 
-    if (!id) return;
-
-    roomRef.set({
+    // Use update instead of set so we don't accidentally wipe the host field
+    roomRef.update({
       videoId: id,
       playing: true,
       currentTime: 0,
-      lastUpdate: Date.now(),
-      host: myId
+      lastUpdate: Date.now()
     });
   };
 
@@ -702,21 +704,18 @@ window.addEventListener("DOMContentLoaded", () => {
   };
 
   window.sendReaction = function (reaction) {
-
     document.getElementById("reactionMenu").classList.remove("open");
 
     const popup = document.createElement("div");
     popup.className = "reaction-popup";
     popup.textContent = reaction;
     document.body.appendChild(popup);
-
     setTimeout(() => popup.remove(), 2000);
 
     let sound;
-
-    if (reaction === "Clap") sound = document.getElementById("clapSound");
+    if (reaction === "Clap")  sound = document.getElementById("clapSound");
     if (reaction === "Cheer") sound = document.getElementById("cheerSound");
-    if (reaction === "Boo") sound = document.getElementById("booSound");
+    if (reaction === "Boo")   sound = document.getElementById("booSound");
 
     if (sound) {
       sound.currentTime = 0;
